@@ -15,8 +15,6 @@ I'm using this repository to:
 * Document my progress.
 * Create a public portfolio of my work.
 
----
-
 ## 📚 What I'm Learning
 
 ### 🐍 Python
@@ -43,8 +41,6 @@ I'm using this repository to:
 * Jupyter Notebook
 * Visual Studio Code
 
----
-
 ## 📂 Repository Structure
 
 ```
@@ -64,8 +60,6 @@ Day 04
 ...
 ```
 
----
-
 ## 🚀 Completed Topics
 
 ### ✅ Day 01
@@ -84,15 +78,11 @@ Day 04
 * Division by Zero Handling
 * Jupyter Notebook Practice
 
----
-
 ## 🎯 My Goal
 
 This repository isn't just about completing internship tasks.
 
 It's about building strong programming habits, improving problem-solving skills, and preparing for real-world AI and software development projects.
-
----
 
 ## 💡 What You'll Find Here
 
@@ -104,7 +94,6 @@ It's about building strong programming habits, improving problem-solving skills,
 * Code improvements
 * Personal reflections
 
----
 
 ## 📈 Progress
 
@@ -119,8 +108,6 @@ It's about building strong programming habits, improving problem-solving skills,
 
 More updates coming soon!
 
----
-
 ## 🛠 Technologies Used
 
 * Python
@@ -129,15 +116,12 @@ More updates coming soon!
 * GitHub
 * Visual Studio Code
 
----
-
 ## 🌱 Why This Repository?
 
 I believe the best way to learn programming is by building and documenting the journey.
 
 This repository serves as my personal learning diary and a record of my growth throughout my AI internship.
 
----
 
 ## 🤝 Feedback
 
@@ -145,7 +129,6 @@ Suggestions and improvements are always welcome.
 
 If you have ideas or spot a better way to solve a problem, feel free to share!
 
----
 
 ## ⭐ Thanks for Visiting!
 
