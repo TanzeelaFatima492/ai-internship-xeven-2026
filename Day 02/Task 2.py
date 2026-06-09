@@ -1,17 +1,21 @@
-# MEMORY MODEL
-x = 22         
-y = x           
-print(id(x) == id(y))   # True
+try:
+    first_number = int(input("Enter First number: "))
+    second_number = int(input("Enter Second number: "))
 
-x = 99         
-print(id(x) == id(y))  
+    print("Adding of", first_number, "and", second_number)
+    print("Result:", first_number + second_number)
 
-# MUTABLE
-a = [1, 2, 3]
-b = a           
-b.append(4)
-print(a)        # [1, 2, 3, 4]  
-b = a.copy()    # real copy
-b.append(99)
-print(a)     
+    print("Subtraction of", first_number, "and", second_number)
+    print("Result:", first_number - second_number)
 
+    print("Multiplication of", first_number, "and", second_number)
+    print("Result:", first_number * second_number)
+
+    print("Quotient of", first_number, "and", second_number)
+    print("Result:", first_number / second_number)
+
+except ValueError:
+    print("Error: Please enter valid integers only (no text allowed).")
+
+except ZeroDivisionError:
+    print("Error: Division by zero is not allowed.")
