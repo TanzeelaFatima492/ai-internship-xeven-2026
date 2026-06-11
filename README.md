@@ -67,9 +67,12 @@ It acts as my **learning journal + portfolio of growth + internship record**.
 |-----|------|--------|
 | Day 01 | Setup + AI Basics | ✅ Completed |
 | Day 02 | Python Basics + Calculator | ✅ Completed |
-| Day 03 | Operators & Logic | 🔄 In Progress |
-| Day 04 | Debugging & Input Handling | ⏳ Upcoming |
-
+| Day 03 | Operators & Logic | ✅ Completed |
+| Day 04 | Debugging & Input Handling | ✅ Completed |
+| Day 05 | Control Flow Practice | ✅ Completed |
+| Day 06 | Python Lists & List Methods | ✅ Completed |
+| Day 07 | Upcoming Topics | ⏳ Upcoming |
+| Day 08 | Upcoming Topics | ⏳ Upcoming |
 
 ## 💡 Key Highlights
 
@@ -77,7 +80,6 @@ It acts as my **learning journal + portfolio of growth + internship record**.
 - Real mini projects instead of only theory  
 - Strong focus on problem-solving  
 - GitHub-based documentation workflow  
-
 
 ## ⚙️ Technologies Used
 
