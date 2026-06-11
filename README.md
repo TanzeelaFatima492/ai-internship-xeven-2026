@@ -70,9 +70,9 @@ It acts as my **learning journal + portfolio of growth + internship record**.
 | Day 03 | Operators & Logic | ✅ Completed |
 | Day 04 | Debugging & Input Handling | ✅ Completed |
 | Day 05 | Control Flow Practice | ✅ Completed |
-| Day 06 | Python Lists & List Methods | ✅ Completed |
-| Day 07 | Upcoming Topics | ⏳ Upcoming |
-| Day 08 | Upcoming Topics | ⏳ Upcoming |
+| Day 06 | Python Lists & Methods | ✅ Completed |
+| Day 08 | Lists and Lists Operation | ✅ Completed |
+| Day 09 | Upcoming Topics | ⏳ Upcoming |
 
 ## 💡 Key Highlights
 
