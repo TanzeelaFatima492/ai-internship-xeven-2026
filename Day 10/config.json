@@ -1,0 +1,15 @@
+{
+    "database": {
+        "host": "localhost",
+        "port": 3306,
+        "name": "app_db"
+    },
+    "api": {
+        "key": "12345-abcde",
+        "base_url": "https://api.example.com"
+    },
+    "features": {
+        "dark_mode": true,
+        "logging": true
+    }
+}
