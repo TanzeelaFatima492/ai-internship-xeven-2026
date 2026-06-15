@@ -69,8 +69,14 @@ It acts as my **learning journal + portfolio of growth + internship record**.
 | Day 04 | Debugging & Input Handling | ✅ Completed |
 | Day 05 | Control Flow Practice | ✅ Completed |
 | Day 06 | Python Lists & List Methods | ✅ Completed |
-| Day 07 | Upcoming Topics | ⏳ Upcoming |
-| Day 08 | Upcoming Topics | ⏳ Upcoming |
+| Day 07 | Python Functions Basics | ✅ Completed |
+| Day 08 | *args, **kwargs & Lambda Functions | ✅ Completed |
+| Day 09 | List & Dictionary Comprehensions | ✅ Completed |
+| Day 10 | Data Transformer Suite (map/filter/sorted) | ✅ Completed |
+| Day 11 | Advanced Comprehensions (flatten, transpose) | ✅ Completed |
+| Day 12 | Logging System + Advanced Functions | ✅ Completed |
+| Day 13 | Python Mini Project Integration (All Concepts) | 🚀 In Progress |
+| Day 14 | Upcoming Topics | ⏳ Upcoming |
 
 ## 💡 Key Highlights
 
