@@ -5,19 +5,23 @@
 ![Git](https://img.shields.io/badge/Git-VersionControl-orange)
 ![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-F37626)
 
+---
+
 ## 👋 About This Repository
 
 This repository documents my **day-by-day learning journey** during my AI Internship 2026.
 
 Throughout this journey, I am building a strong foundation in:
 
-* Python Programming 🐍
-* Artificial Intelligence 🤖
-* Data Structures & Algorithms 🧠
-* Problem Solving 💡
-* Development Tools 💻
+* 🐍 Python Programming
+* 🤖 Artificial Intelligence
+* 🧠 Data Structures & Algorithms
+* 💡 Problem Solving
+* 💻 Development Tools
 
-This repository serves as my:
+---
+
+## 📌 Purpose of this Repository
 
 * 📖 Learning Journal
 * 💼 Portfolio of Growth
@@ -26,10 +30,10 @@ This repository serves as my:
 
 ---
 
-# 🎯 Learning Goals
+## 🎯 Learning Goals
 
 * Build strong Python fundamentals
-* Develop logical thinking and debugging skills
+* Improve logical thinking and debugging skills
 * Practice coding every day
 * Understand AI and Machine Learning basics
 * Work on real-world mini projects
@@ -37,7 +41,7 @@ This repository serves as my:
 
 ---
 
-# 🚀 Repository Contents
+## 🚀 Repository Contents
 
 * 📘 Daily Learning Notes
 * 📓 Jupyter Notebooks
@@ -49,9 +53,9 @@ This repository serves as my:
 
 ---
 
-# 📚 Learning Roadmap
+## 📚 Learning Roadmap
 
-## 🐍 Python Programming
+### 🐍 Python Programming
 
 * Variables & Data Types
 * Input & Output
@@ -59,21 +63,18 @@ This repository serves as my:
 * Conditional Statements
 * Loops
 * Functions
-* *args & **kwargs
+* `*args`, `**kwargs`
 * Lambda Functions
-* List Comprehensions
-* Dictionary Comprehensions
-* Map, Filter & Sorted
-* Nested Comprehensions
-* Advanced Functions
+* List & Dictionary Comprehensions
+* `map()`, `filter()`, `sorted()`
 * Error Handling
-* JSON File Handling
-* Dictionaries, Sets, Lists & Tuples
-* Mini Project Development
+* File Handling (JSON)
+* Data Structures (Lists, Sets, Tuples, Dicts)
+* Mini Projects
 
 ---
 
-## 🤖 Artificial Intelligence
+### 🤖 Artificial Intelligence
 
 * AI Fundamentals
 * Machine Learning Basics
@@ -83,172 +84,162 @@ This repository serves as my:
 
 ---
 
-## 🛠 Tools & Technologies
+### 🛠 Tools & Technologies
 
 * Git & GitHub
 * VS Code
 * Jupyter Notebook
 * Python CLI
-* JSON Files
-* Command Line Interface
-
----
-
-# 📊 Progress Tracker
-
-| Day    | Topic                                              | Status      |
-| ------ | -------------------------------------------------- | ----------- |
-| Day 01 | Environment Setup + AI Basics                      | ✅ Completed |
-| Day 02 | Python Basics + Calculator                         | ✅ Completed |
-| Day 03 | Operators & Expressions                            | ✅ Completed |
-| Day 04 | Input Handling & Debugging                         | ✅ Completed |
-| Day 05 | Conditional Statements & Loops                     | ✅ Completed |
-| Day 06 | Python Lists & Methods                             | ✅ Completed |
-| Day 07 | Function Basics                                    | ✅ Completed |
-| Day 08 | *args, **kwargs & Lambda Functions                 | ✅ Completed |
-| Day 09 | List & Dictionary Comprehensions                   | ✅ Completed |
-| Day 10 | map(), filter(), sorted()                          | ✅ Completed |
-| Day 11 | Advanced Comprehensions                            | ✅ Completed |
-| Day 12 | Logging System & Advanced Functions                | ✅ Completed |
-| Day 13 | Python Integration Mini Projects                   | ✅ Completed |
-| Day 14 | Contact Management System + JSON + Data Structures | ✅ Completed |
-
----
-
-# 🚀 Day 14 Highlights
-
-## 📒 Contact Management System
-
-### Features
-
-* Add Contact
-* Search Contact
-* Update Contact
-* Delete Contact
-* Tag Management
-* Find Contacts by Tag
-* Save to JSON
-* Load from JSON
-* Statistics
-* Interactive CLI Menu
-
-### Python Concepts Used
-
-* Functions
-* Dictionaries
-* Nested Dictionaries
-* Lists
-* Sets
-* List Comprehensions
-* Dictionary Comprehensions
 * JSON Handling
-* Error Handling
-* File Operations
-* While Loops
-* Conditional Statements
+* Terminal / Command Line
 
 ---
 
-# 💡 Key Highlights
+## 📊 Progress Tracker
 
-✅ Daily coding practice
-
-✅ Hands-on mini projects
-
-✅ Real debugging experience
-
-✅ GitHub documentation
-
-✅ Python CLI applications
-
-✅ File handling with JSON
-
-✅ Data structure implementation
-
-✅ Problem-solving approach
-
----
-
-# ⚙️ Technologies Used
-
-* Python 🐍
-* Jupyter Notebook 📓
-* Git & GitHub 🔧
-* VS Code 💻
-* JSON 📄
-* CLI Terminal ⚡
+| Day    | Topic                                     | Status       |
+| ------ | ----------------------------------------- | ------------ |
+| Day 01 | Environment Setup + AI Basics             | ✅ Completed  |
+| Day 02 | Python Basics + Calculator                | ✅ Completed  |
+| Day 03 | Operators & Expressions                   | ✅ Completed  |
+| Day 04 | Input Handling & Debugging                | ✅ Completed  |
+| Day 05 | Conditional Statements & Loops            | ✅ Completed  |
+| Day 06 | Python Lists & Methods                    | ✅ Completed  |
+| Day 07 | Functions Basics                          | ✅ Completed  |
+| Day 08 | *args, **kwargs, Lambda                   | ✅ Completed  |
+| Day 09 | Comprehensions                            | ✅ Completed  |
+| Day 10 | map(), filter(), sorted()                 | ✅ Completed  |
+| Day 11 | Advanced Comprehensions                   | ✅ Completed  |
+| Day 12 | Logging System & Advanced Functions       | ✅ Completed  |
+| Day 13 | Mini Projects                             | ✅ Completed  |
+| Day 14 | Contact Management System                 | ✅ Completed  |
+| Day 15 | AI + Data Structures Practice             | 🚀 Completed |
+| Day 16 | Embeddings + Similarity Concepts          | 🚀 Completed |
+| Day 17 | Chunking Strategies + LangChain Splitters | 🚀 Completed |
+| Day 18 | Smart Document Processor                  | 🚀 Completed |
 
 ---
 
-# 🌱 Why This Repository?
+## 🚀 Day 18 Highlights
+
+### 📒 Smart Document Processor
+
+* Auto-detects document type (text / markdown / code)
+* Applies appropriate chunking strategy
+* Preserves structure (headers, functions, sections)
+* Uses intelligent overlap for better context
+* Generates metadata-rich chunks for retrieval systems
+
+---
+
+### 🧠 Key Concepts Learned
+
+* Document Type Detection
+* Recursive Text Splitting
+* Token-Based Chunking
+* Markdown Header Splitting
+* Code-Aware Chunking
+* Metadata Preservation
+* Retrieval Optimization
+
+---
+
+### ⚖️ Key Insight
+
+* Small chunks → high precision, low context
+* Large chunks → high context, low precision
+* Medium chunks → best balance for AI retrieval
+
+---
+
+## 💡 Key Highlights
+
+* ✔ Daily coding practice
+* ✔ AI pipeline understanding
+* ✔ Chunking strategy optimization
+* ✔ Metadata-based processing
+* ✔ Retrieval system thinking
+
+---
+
+## ⚙️ Technologies Used
+
+* 🐍 Python
+* 📓 Jupyter Notebook
+* 🔗 LangChain Concepts
+* 🔧 Git & GitHub
+* 💻 VS Code
+* 📄 JSON Handling
+
+---
+
+## 🌱 Why This Repository?
 
 > "Programming is learned by writing code, making mistakes, and improving every day."
 
 This repository helps me:
 
-* Track my daily progress
-* Build a strong coding portfolio
-* Practice consistency
-* Document internship learning
-* Showcase real projects
+* Track daily progress
+* Build coding consistency
+* Document AI internship journey
+* Showcase real-world learning
 
 ---
 
-# 🏆 Skills Developed
+## 🏆 Skills Developed
 
-## Python
+### 🐍 Python
 
 * Functions
-* Lambda
-* Comprehensions
 * Data Structures
 * File Handling
-* JSON
 * Error Handling
+* Comprehensions
 
-## Problem Solving
+### 🤖 AI Concepts
 
-* Debugging
-* Logical Thinking
-* Algorithm Design
+* Embeddings
+* Chunking
+* RAG Basics
+* Text Processing
 
-## Development
+### 💻 Development Tools
 
-* Git
-* GitHub
+* Git & GitHub
 * VS Code
-* Jupyter Notebook
+* Jupyter Notebooks
 
 ---
 
-# 🤝 Feedback
+## 🤝 Feedback
 
 I welcome:
 
 * Code Reviews
 * Suggestions
-* Better Solutions
+* Better Approaches
 * Collaboration
-* Best Practices
 
 ---
 
-# ⭐ Support
+## ⭐ Support
 
-If you enjoy following this journey:
+If you like this journey:
 
-⭐ Star the repository
-
-👀 Follow my progress
-
-💬 Share feedback and suggestions
+* ⭐ Star the repository
+* 👀 Follow progress
+* 💬 Share feedback
 
 ---
 
-# 🚀 Final Note
+## 🚀 Final Note
 
-This repository is more than a collection of Python programs.
+This repository represents my **AI + Python learning journey step by step**.
 
-It represents my journey of learning, practicing, debugging, and building real projects during my AI Internship 2026.
+Every day includes:
 
-Every day adds a new concept, a new challenge, and a new step toward becoming an AI Engineer and Software Developer.
+* 🧠 new concepts
+* 🧪 new practice
+* 🚀 new improvements
+
+towards becoming an **AI Engineer & Software Developer**
