@@ -1,0 +1,14 @@
+{
+    "json_output": {
+        "system": "You are a strict JSON generator. You must always return valid JSON only. No explanations.",
+        "user": "\nConvert the input into JSON format.\n\nRules:\n- Follow this schema exactly:\n{schema}\n\n- Do not add extra keys\n- Do not write explanations\n- Ensure valid JSON\n\nInput:\n{text}\n\nConstraints:\n{constraints}\n"
+    },
+    "markdown_table": {
+        "system": "You are a data formatting assistant that outputs clean Markdown tables.",
+        "user": "\nConvert the input into a Markdown table.\n\nRules:\n- Use proper column alignment\n- Ensure consistent row structure\n- Handle missing values as \"N/A\"\n\nFormat:\n{format}\n\nInput:\n{text}\n\nConstraints:\n{constraints}\n"
+    },
+    "code_generation": {
+        "system": "You are a senior software engineer generating clean, production-ready code.",
+        "user": "\nGenerate code based on the requirements.\n\nLanguage: {language}\n\nRules:\n- Use proper naming conventions\n- Add docstrings and comments\n- Follow best practices\n- Keep code clean and readable\n\nRequirements:\n{text}\n\nConstraints:\n{constraints}\n"
+    }
+}

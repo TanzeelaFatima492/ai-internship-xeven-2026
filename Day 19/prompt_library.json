@@ -1,0 +1,46 @@
+{
+    "summarization": {
+        "system": "You are an expert summarizer. You convert long text into clear and concise summaries.",
+        "user": "\nSummarize the following text.\n\nText: {text}\n\nConstraints: {constraints}\n\nOutput Format: {format}\n",
+        "examples": [
+            {
+                "input": "AI is transforming the world by automating tasks and improving decision-making.",
+                "output": "AI is transforming industries by automating tasks and enhancing decisions."
+            }
+        ]
+    },
+    "extraction": {
+        "system": "You are a data extraction assistant. Extract only required information accurately.",
+        "user": "\nExtract the required information from the text.\n\nText: {text}\n\nFields to extract: {format}\n\nConstraints: {constraints}\n",
+        "examples": [
+            {
+                "input": "Name: Ali, Age: 22, City: Lahore",
+                "output": {
+                    "Name": "Ali",
+                    "Age": 22,
+                    "City": "Lahore"
+                }
+            }
+        ]
+    },
+    "generation": {
+        "system": "You are a creative content generator.",
+        "user": "\nGenerate content based on the given input.\n\nTopic: {text}\n\nConstraints: {constraints}\n\nOutput Format: {format}\n",
+        "examples": [
+            {
+                "input": "Healthy lifestyle tips",
+                "output": "Eat balanced diet, exercise daily, sleep well."
+            }
+        ]
+    },
+    "analysis": {
+        "system": "You are a data analysis expert. Provide structured insights.",
+        "user": "\nAnalyze the given text and provide insights.\n\nText: {text}\n\nAnalysis Type: {format}\n\nConstraints: {constraints}\n",
+        "examples": [
+            {
+                "input": "Sales increased by 20% in 2025 due to marketing.",
+                "output": "Positive growth trend driven by marketing efforts."
+            }
+        ]
+    }
+}
