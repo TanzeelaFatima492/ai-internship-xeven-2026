@@ -1,0 +1,39 @@
+{
+    "TechNova Pvt Ltd": {
+        "location": "Islamabad",
+        "employees": {
+            "Ali Khan": {
+                "title": "AI Engineer",
+                "department": "R&D",
+                "skills": [
+                    "Python",
+                    "ML",
+                    "NLP"
+                ]
+            },
+            "Sara Ahmed": {
+                "title": "Data Analyst",
+                "department": "Analytics",
+                "skills": [
+                    "SQL",
+                    "Python",
+                    "PowerBI"
+                ]
+            }
+        }
+    },
+    "SoftSolutions": {
+        "location": "Lahore",
+        "employees": {
+            "Usman Ali": {
+                "title": "Backend Developer",
+                "department": "Engineering",
+                "skills": [
+                    "Node.js",
+                    "MongoDB",
+                    "APIs"
+                ]
+            }
+        }
+    }
+}
