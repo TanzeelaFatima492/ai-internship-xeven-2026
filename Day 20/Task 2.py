@@ -1,13 +1,27 @@
 from pydantic import BaseModel
 from typing import List
 from datetime import date
+from dotenv import load_dotenv
+from langchain_groq import ChatGroq
 
-# 🔑 Import config (loads API key automatically)
-import config
+import os
+import json
 
-from langchain_openai import ChatOpenAI
+# -------------------
+# Load Environment
+# -------------------
 
-# 📦 Pydantic Model
+load_dotenv()
+
+api_key = os.getenv("GROQ_API_KEY")
+
+if not api_key:
+    raise ValueError("GROQ_API_KEY not found in .env")
+
+# -------------------
+# Pydantic Model
+# -------------------
+
 class Article(BaseModel):
     title: str
     author: str
@@ -15,29 +29,82 @@ class Article(BaseModel):
     summary: str
     tags: List[str]
 
+# -------------------
+# LLM
+# -------------------
 
-# 🤖 LLM Setup
-llm = ChatOpenAI(model="gpt-4o-mini")
+llm = ChatGroq(
+    model="llama-3.3-70b-versatile",
+    api_key=api_key,
+)
 
-article_chain = llm.with_structured_output(Article)
+# -------------------
+# Raw Article
+# -------------------
 
-
-# 🧾 Input Text
 raw_text = """
 Title: AI Revolution in 2026
+
 Author: John Smith
+
 Published Date: 2026-06-10
-Summary: AI is transforming industries rapidly.
-Tags: AI, technology, future
+
+Summary:
+AI is transforming industries rapidly through automation,
+machine learning, and large language models.
+
+Tags:
+AI, technology, future
 """
 
+# -------------------
+# Prompt
+# -------------------
 
-# 🚀 Run Pipeline
-def safe_parse(text):
+prompt = f"""
+Extract the following article information.
+
+Return ONLY valid JSON.
+
+Required format:
+
+{{
+    "title":"",
+    "author":"",
+    "published_date":"",
+    "summary":"",
+    "tags":[]
+}}
+
+Article:
+
+{raw_text}
+"""
+
+# -------------------
+# Safe Parse
+# -------------------
+
+def safe_parse():
+
     try:
-        return article_chain.invoke(text)
+
+        response = llm.invoke(prompt)
+
+        text = response.content.strip()
+
+        print("\nRaw LLM Output:\n")
+        print(text)
+
+        data = json.loads(text)
+
+        article = Article(**data)
+
+        return article
+
     except Exception as e:
-        print("Error:", e)
+
+        print("\nError:", e)
 
         return Article(
             title="Unknown",
@@ -47,11 +114,14 @@ def safe_parse(text):
             tags=[]
         )
 
+# -------------------
+# Run
+# -------------------
 
-result = safe_parse(raw_text)
+result = safe_parse()
 
-print("\n📌 Structured Output:\n")
+print("\nStructured Output:\n")
 print(result)
 
-print("\n📊 JSON Format:\n")
+print("\nJSON Format:\n")
 print(result.model_dump())
