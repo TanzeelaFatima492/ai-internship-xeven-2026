@@ -1,50 +1,33 @@
 import os
-import json
 from dotenv import load_dotenv
 
 from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.vectorstores import Chroma
+from langchain_groq import ChatGroq
 
-# LOAD ENV
+from langchain_classic.memory import ConversationSummaryBufferMemory
+from langchain_classic.chains import ConversationalRetrievalChain
 
+# Load API keys
 load_dotenv()
 
-# CHAT HISTORY (JSON)
-
-CHAT_FILE = "chat_history.json"
-
-def load_history():
-    if os.path.exists(CHAT_FILE):
-        with open(CHAT_FILE, "r") as f:
-            return json.load(f)
-    return {}
-
-def save_history(data):
-    with open(CHAT_FILE, "w") as f:
-        json.dump(data, f, indent=4)
-
-chat_store = load_history()
-
-# LOAD DOCUMENTS
+#!. Data loading
+if not os.path.exists("data.txt"):
+    raise FileNotFoundError("data.txt not found – please create it with some content about FAISS, Chroma, etc.")
 
 loader = TextLoader("data.txt", encoding="utf-8")
 documents = loader.load()
 
+# keep only non-empty texts
 texts = [d.page_content for d in documents if d.page_content.strip()]
 
-splitter = RecursiveCharacterTextSplitter(
-    chunk_size=500,
-    chunk_overlap=50
-)
-
+splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
 docs = splitter.create_documents(texts)
+print(f"📦 Total chunks: {len(docs)}")
 
-print("📦 Total chunks:", len(docs))
-
-# EMBEDDINGS + VECTOR DB
-
+#2. Embeddings & Vector Store 
 embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
@@ -56,74 +39,40 @@ vectorstore = Chroma.from_documents(
 
 retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
-# GUIDE MESSAGE
+# 3. LLM
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",
+    temperature=0
+)
 
-print("""
-💡 HOW TO ASK QUESTIONS:
- Only ask questions related to FAISS, Chroma, vector databases.
-""")
+# 4. Memory with SUMMARIZATION
+memory = ConversationSummaryBufferMemory(
+    llm=llm,                     # same LLM used to summarise old conversations
+    memory_key="chat_history",   # chain expects this key
+    return_messages=True,
+    max_token_limit=300,         # summarise older messages when buffer exceeds this limit
+    # This naturally keeps last ~10 exchanges depending on length,
+    # and older ones become a concise summary.
+)
 
-# CHECK RELEVANCE
+#5. Conversational RAG Chain 
+qa_chain = ConversationalRetrievalChain.from_llm(
+    llm=llm,
+    retriever=retriever,
+    memory=memory,
+    verbose=False   # set True if you want to see retrieved documents
+)
 
-def is_relevant(query, docs):
-    content = " ".join([d.page_content.lower() for d in docs])
-
-    for word in query.lower().split():
-        if word in content:
-            return True
-
-    return False
-
-# CHAT FUNCTION
-
-def chat(user_id, query):
-
-    history = chat_store.get(user_id, [])
-
-    context_docs = retriever.invoke(query)
-    context = "\n".join([d.page_content for d in context_docs])
-
-    #  OUT OF CONTEXT HANDLING
-    if len(query.strip()) < 3:
-        return " Please ask a proper question (e.g. What is FAISS?)"
-
-    if not is_relevant(query, context_docs):
-        answer = " I don't have that information in my knowledge base. Please ask related questions about FAISS, Chroma, or vector databases."
-    else:
-        answer = f"""
-🤖 AI ANSWER:
-
-{context[:500]}
-"""
-
-    # save history
-    history.append(f"User: {query}")
-    history.append(f"AI: {answer}")
-
-    chat_store[user_id] = history[-20:]
-    save_history(chat_store)
-
-    return answer
-
-
-# CHAT LOOP
-
-print("\n💬 Conversational RAG Chatbot Started\n")
-
-user_id = input("👤 Enter your name: ")
+#6. Chat Loop
+print("\n💬 Conversational RAG Chatbot (Memory + Summarisation)")
+print("Type 'exit' to stop.\n")
 
 while True:
-
-    print("\n Recent Chat:")
-    for msg in chat_store.get(user_id, [])[-6:]:
-        print(msg)
-
-    query = input("\n 👱:")
-
-    if query.lower() == "exit":
-        print("👋 Chat Ended")
+    query = input("You: ")
+    if query.lower() in ["exit", "quit"]:
+        print("👋 Chat ended.")
         break
 
-    answer = chat(user_id, query)
-
-    print("\n🤖", answer)
+    result = qa_chain.invoke({"question": query})
+    print("Bot:", result["answer"])
+    print("-" * 50)
