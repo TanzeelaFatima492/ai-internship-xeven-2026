@@ -1,0 +1,52 @@
+{
+    "user1": [
+        "User: What is FAISS?",
+        "AI: Answer based on context..."
+    ],
+    "Tanzeela": [
+        "User: hi",
+        "AI: Answer based on context:\nFAISS is a vector database used for similarity search.\nChroma is used for storing embeddings....",
+        "User: oye",
+        "AI: Answer based on context:\nFAISS is a vector database used for similarity search.\nChroma is used for storing embeddings....",
+        "User: bu",
+        "AI: Answer based on context:\nFAISS is a vector database used for similarity search.\nChroma is used for storing embeddings....",
+        "User: ",
+        "AI: Answer based on context:\nFAISS is a vector database used for similarity search.\nChroma is used for storing embeddings....",
+        "User: ",
+        "AI: Answer based on context:\nFAISS is a vector database used for similarity search.\nChroma is used for storing embeddings....",
+        "User: ",
+        "AI: Answer based on context:\nFAISS is a vector database used for similarity search.\nChroma is used for storing embeddings....",
+        "User: ",
+        "AI: Answer based on context:\nFAISS is a vector database used for similarity search.\nChroma is used for storing embeddings....",
+        "User: ",
+        "AI: Answer based on context:\nFAISS is a vector database used for similarity search.\nChroma is used for storing embeddings....",
+        "User: \"c:\\Users\\Hi Tech Computer\\OneDrive\\Desktop\\Intership learning\\ai-internship-xeven-2026\\.venv\\Scripts\\python.exe\" \"c:/Users/Hi Tech Computer/OneDrive/Desktop/Intership learning/ai-internship-xeven-2026/Day 24/Conversational rag.py\"",
+        "AI: Answer based on context:\nFAISS is a vector database used for similarity search.\nChroma is used for storing embeddings....",
+        "User: vector",
+        "AI: Answer based on context:\nFAISS is a vector database used for similarity search.\nChroma is used for storing embeddings...."
+    ],
+    "Fatima": [
+        "User: What is chroma",
+        "AI: \n\ud83e\udd16 AI ANSWER:\n\nFAISS is a vector database used for similarity search.\nChroma is used for storing embeddings.\n",
+        "User: tum",
+        "AI: \u274c I don't have that information in my knowledge base. Please ask related questions about FAISS, Chroma, or vector databases.",
+        "User: nice one",
+        "AI:  I don't have that information in my knowledge base. Please ask related questions about FAISS, Chroma, or vector databases.",
+        "User: vector",
+        "AI: \n\ud83e\udd16 AI ANSWER:\n\n========================================\nWHAT ARE VECTORS?\n========================================\n\nBefore we can understand vector databases, we need to understand what a vector is. In simple terms, a vector is just a list of numbers. That might sound too simple to be important, but vectors are one of the most powerful tools in modern AI and mathematics.\nIn AI, vectors are used to represent things in a way that computers can understand and compare. When an AI system reads a word, a sentence, o\n"
+    ],
+    "\"c:\\Users\\Hi Tech Computer\\OneDrive\\Desktop\\Intership learning\\ai-internship-xeven-2026\\.venv\\Scripts\\python.exe\" \"c:/Users/Hi Tech Computer/OneDrive/Desktop/Intership learning/ai-internship-xeven-2026/Day 24/Conversational rag.py\"": [
+        "User: \"c:\\Users\\Hi Tech Computer\\OneDrive\\Desktop\\Intership learning\\ai-internship-xeven-2026\\.venv\\Scripts\\python.exe\" \"c:/Users/Hi Tech Computer/OneDrive/Desktop/Intership learning/ai-internship-xeven-2026/Day 24/Conversational rag.py\"",
+        "AI: \u274c I don't have that information in my knowledge base. Please ask related questions about FAISS, Chroma, or vector databases.",
+        "User: \"c:\\Users\\Hi Tech Computer\\OneDrive\\Desktop\\Intership learning\\ai-internship-xeven-2026\\.venv\\Scripts\\python.exe\" \"c:/Users/Hi Tech Computer/OneDrive/Desktop/Intership learning/ai-internship-xeven-2026/Day 24/Conversational rag.py\"",
+        "AI: \u274c I don't have that information in my knowledge base. Please ask related questions about FAISS, Chroma, or vector databases.",
+        "User: \"c:\\Users\\Hi Tech Computer\\OneDrive\\Desktop\\Intership learning\\ai-internship-xeven-2026\\.venv\\Scripts\\python.exe\" \"c:/Users/Hi Tech Computer/OneDrive/Desktop/Intership learning/ai-internship-xeven-2026/Day 24/Conversational rag.py\"",
+        "AI: \u274c I don't have that information in my knowledge base. Please ask related questions about FAISS, Chroma, or vector databases.",
+        "User: \"c:\\Users\\Hi Tech Computer\\OneDrive\\Desktop\\Intership learning\\ai-internship-xeven-2026\\.venv\\Scripts\\python.exe\" \"c:/Users/Hi Tech Computer/OneDrive/Desktop/Intership learning/ai-internship-xeven-2026/Day 24/Conversational rag.py\"",
+        "AI: \u274c I don't have that information in my knowledge base. Please ask related questions about FAISS, Chroma, or vector databases."
+    ],
+    "TanzeelaFatima": [
+        "User: what is FAISS",
+        "AI: \n\ud83e\udd16 AI ANSWER:\n\nFAISS, which stands for Facebook AI Similarity Search, is an open-source library developed by Meta, formerly known as Facebook. It is not technically a database in the traditional sense, but rather a library that provides powerful algorithms for similarity search. Developers use FAISS when they want fast, efficient vector search that runs directly on their own machines or servers.\nFAISS is written in C++ and has Python bindings, which means developers can use it easily from Python code. It can r\n"
+    ]
+}
