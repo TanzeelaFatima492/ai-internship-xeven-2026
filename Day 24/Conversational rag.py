@@ -51,8 +51,6 @@ memory = ConversationSummaryBufferMemory(
     memory_key="chat_history",   # chain expects this key
     return_messages=True,
     max_token_limit=300,         # summarise older messages when buffer exceeds this limit
-    # This naturally keeps last ~10 exchanges depending on length,
-    # and older ones become a concise summary.
 )
 
 #5. Conversational RAG Chain 
