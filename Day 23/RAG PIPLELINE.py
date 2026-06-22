@@ -8,12 +8,12 @@ from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
-from langchain_groq import ChatGroq              # ← Groq instead of Gemini
+from langchain_groq import ChatGroq              #
 
-# ---------- 0. Load API key from .env ----------
+# Load API key from .env 
 load_dotenv()
 
-# ---------- 1. Load & split documents ----------
+#  1. Load & split documents 
 loader = TextLoader("data.txt")
 documents = loader.load()
 
@@ -23,16 +23,16 @@ splitter = RecursiveCharacterTextSplitter(
 )
 docs = splitter.split_documents(documents)
 
-# ---------- 2. Embeddings & FAISS vector store ----------
+#2. Embeddings & FAISS vector store
 embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 vectorstore = FAISS.from_documents(docs, embeddings)
 
-# ---------- 3. Retriever ----------
+# 3. Retriever 
 retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
 
-# ---------- 4. Prompt template ----------
+# 4. Prompt template
 prompt = PromptTemplate(
     input_variables=["context", "question"],
     template="""
@@ -54,11 +54,11 @@ llm = ChatGroq(
     temperature=0
 )
 
-# ---------- 6. Helper to format retrieved docs ----------
+#6. Helper to format retrieved docs 
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
-# ---------- 7. LCEL RAG chain ----------
+#  7. LCEL RAG chain 
 rag_chain = (
     {"context": retriever | format_docs, "question": RunnablePassthrough()}
     | prompt
@@ -66,14 +66,14 @@ rag_chain = (
     | StrOutputParser()
 )
 
-# ---------- 8. Ask a question ----------
+# 8. Ask a question
 query = "What is RAG?"
 answer = rag_chain.invoke(query)
 
 print("ANSWER:")
 print(answer)
 
-# ---------- 9. Show retrieved sources ----------
+#  9. Show retrieved sources 
 retrieved_docs = retriever.invoke(query)
 print("\nSOURCES:")
 for i, doc in enumerate(retrieved_docs, start=1):
