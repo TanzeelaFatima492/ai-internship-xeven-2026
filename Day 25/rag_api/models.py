@@ -1,20 +1,20 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List
 
 
 class AskRequest(BaseModel):
     query: str
 
 
-class UploadResponse(BaseModel):
-    message: str
-    doc_ids: List[str]
+class SearchRequest(BaseModel):
+    query: str
+    top_k: int = 5
 
 
-class SearchResponse(BaseModel):
-    results: List[dict]
+class SearchResult(BaseModel):
+    text: str
 
 
-class HealthResponse(BaseModel):
-    status: str
-    total_documents: int
+class AskResponse(BaseModel):
+    answer: str
+    sources: List[str]

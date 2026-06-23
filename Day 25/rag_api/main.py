@@ -1,15 +1,42 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from models import AskRequest
+import os
 import time
+import psutil
 import logging
-from groq import Groq
-from fastapi import HTTPException
-from rag import init_index, add_document, search, documents
 
-app = FastAPI(title="RAG API")
+from fastapi import (
+    FastAPI,
+    UploadFile,
+    File,
+    HTTPException
+)
 
-#     CORS    
+from fastapi.middleware.cors import CORSMiddleware
+
+from models import (
+    AskRequest,
+    SearchRequest
+)
+
+from rag import (
+    add_document,
+    search_documents,
+    documents
+)
+
+from llm import generate_answer
+
+app = FastAPI(
+    title="Production RAG API"
+)
+
+# Logging
+
+logging.basicConfig(
+    level=logging.INFO
+)
+
+# CORS
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -18,84 +45,169 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-#     LOGGING    
-logging.basicConfig(level=logging.INFO)
+# -------------------------
+# Upload Document
+# -------------------------
 
-
-@app.on_event("startup")
-async def startup():
-    init_index()
-    logging.info("RAG system started")
-
-
-#     UPLOAD    
 @app.post("/documents/upload")
-async def upload_document(file: UploadFile = File(...)):
+async def upload_document(
+    file: UploadFile = File(...)
+):
+
     try:
+
         start = time.time()
 
         content = await file.read()
+
         text = content.decode("utf-8")
 
-        doc_ids = add_document(text, {"filename": file.filename})
+        doc_id, chunks = add_document(
+            text,
+            file.filename
+        )
 
-        logging.info(f"Uploaded {file.filename} in {time.time()-start:.2f}s")
-
-        return {"message": "uploaded", "doc_ids": doc_ids}
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-#     LIST DOCS    
-@app.get("/documents")
-async def get_documents():
-    return documents
-
-
-#     DELETE    
-@app.delete("/documents/{doc_id}")
-async def delete_document(doc_id: str):
-    if doc_id not in documents:
-        raise HTTPException(status_code=404, detail="Document not found")
-
-    del documents[doc_id]
-    return {"message": "deleted"}
-
-
-#     ASK RAG    
-@app.post("/ask")
-async def ask(req: AskRequest):
-    try:
-        results = search(req.query)
-
-        context_chunks = [r["text"] for r in results]
-
-        answer = generate_answer(req.query, context_chunks)
+        logging.info(
+            f"Uploaded {file.filename}"
+        )
 
         return {
-            "answer": answer,
-            "sources": results
+            "message": "Document indexed successfully",
+            "document_id": doc_id,
+            "chunks": chunks,
+            "processing_time": round(
+                time.time() - start,
+                2
+            )
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
-#     SEMANTIC SEARCH ONLY    
+        logging.error(str(e))
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+# -------------------------
+# List Documents
+# -------------------------
+
+@app.get("/documents")
+def get_documents():
+
+    return documents
+
+# -------------------------
+# Delete Document
+# -------------------------
+
+@app.delete("/documents/{doc_id}")
+def delete_document(doc_id: str):
+
+    if doc_id not in documents:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found"
+        )
+
+    del documents[doc_id]
+
+    return {
+        "message": "Document deleted"
+    }
+
+# -------------------------
+# Semantic Search
+# -------------------------
+
 @app.post("/search")
-async def semantic_search(req: AskRequest):
+async def search(
+    request: SearchRequest
+):
+
     try:
-        results = search(req.query)
-        return {"results": results}
+
+        results = search_documents(
+            request.query,
+            request.top_k
+        )
+
+        return {
+            "results": results
+        }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
-#     HEALTH    
+# -------------------------
+# Ask RAG
+# -------------------------
+
+@app.post("/ask")
+async def ask(
+    request: AskRequest
+):
+
+    try:
+
+        results = search_documents(
+            request.query,
+            5
+        )
+
+        context = "\n".join(
+            [r["text"] for r in results]
+        )
+
+        answer = generate_answer(
+            request.query,
+            context
+        )
+
+        sources = list(
+            set(
+                [
+                    r["source"]
+                    for r in results
+                ]
+            )
+        )
+
+        return {
+            "answer": answer,
+            "sources": sources
+        }
+
+    except Exception as e:
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+# -------------------------
+# Health Check
+# -------------------------
+
 @app.get("/health")
-async def health():
+def health():
+
+    memory = psutil.Process(
+        os.getpid()
+    ).memory_info().rss / 1024 / 1024
+
     return {
-        "status": "ok",
-        "total_documents": len(documents)
+        "status": "healthy",
+        "document_count": len(documents),
+        "memory_usage_mb": round(
+            memory,
+            2
+        )
     }
