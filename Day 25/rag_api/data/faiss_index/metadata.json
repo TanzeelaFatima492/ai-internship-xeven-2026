@@ -1,9 +1,16 @@
 {
-  "documents": [
-    {
-      "id": "doc_001",
-      "filename": "rag.pdf",
-      "chunks": 42
-    }
-  ]
+    "documents": [
+        {
+            "id": "123",
+            "filename": "rag.pdf",
+            "filepath": "data/uploads/rag.pdf",
+            "chunks": 42
+        },
+        {
+            "id": "8ef6c62c-c8f6-487c-8eb7-48489be9e577",
+            "filename": "Design phase - Copy.pdf",
+            "filepath": "data/uploads\\Design phase - Copy.pdf",
+            "chunks": 16
+        }
+    ]
 }
