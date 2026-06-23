@@ -35,9 +35,9 @@ class DocumentManager:
 
         self._initialize_metadata()
 
-    # -------------------------
+    #       -
     # Metadata helpers
-    # -------------------------
+    #       -
 
     def _initialize_metadata(self):
 
@@ -55,9 +55,9 @@ class DocumentManager:
         with open(self.metadata_file, "w") as f:
             json.dump(data, f, indent=4)
 
-    # -------------------------
+    #       -
     # Document loading
-    # -------------------------
+    #       -
 
     def _load_document(self, filepath):
 
@@ -81,9 +81,9 @@ class DocumentManager:
 
         return splitter.split_documents(documents)
 
-    # -------------------------
+    #       -
     # Upload
-    # -------------------------
+    #       -
 
     def save_uploaded_file(self, file):
 
@@ -146,17 +146,17 @@ class DocumentManager:
             "status": "indexed"
         }
 
-    # -------------------------
+    #       -
     # List
-    # -------------------------
+    #       -
 
     def list_documents(self):
 
         return self._load_metadata()["documents"]
 
-    # -------------------------
+    #       -
     # Rebuild Index
-    # -------------------------
+    #       -
 
     def rebuild_index(self):
 
@@ -186,9 +186,9 @@ class DocumentManager:
 
         vectorstore.save_local(index_path)
 
-    # -------------------------
+    #       -
     # Delete
-    # -------------------------
+    #       -
 
     def delete_document(self, document_id):
 
@@ -218,9 +218,9 @@ class DocumentManager:
 
         return True
 
-    # -------------------------
+    #       -
     # Stats
-    # -------------------------
+    #       -
 
     def get_document_count(self):
 
