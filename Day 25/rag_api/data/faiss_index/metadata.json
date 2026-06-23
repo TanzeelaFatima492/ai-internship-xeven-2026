@@ -1,0 +1,9 @@
+{
+  "documents": [
+    {
+      "id": "doc_001",
+      "filename": "rag.pdf",
+      "chunks": 42
+    }
+  ]
+}
