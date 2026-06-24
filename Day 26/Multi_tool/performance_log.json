@@ -1,0 +1,10 @@
+{
+  "session_duration_seconds": 31.4,
+  "tools": {
+    "llm": {
+      "calls": 5,
+      "success_rate": "100.0%",
+      "avg_time_seconds": 0.314
+    }
+  }
+}
