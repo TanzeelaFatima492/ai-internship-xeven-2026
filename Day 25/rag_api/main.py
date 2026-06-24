@@ -1,5 +1,7 @@
+import os
 import time
 import psutil
+import logging
 
 from fastapi import (
     FastAPI,
@@ -10,26 +12,32 @@ from fastapi import (
 
 from fastapi.middleware.cors import CORSMiddleware
 
-from document_manager import DocumentManager
-from rag_service import RAGService
-
 from models import (
     AskRequest,
     SearchRequest
 )
 
-from logger import logger
-
-
-app = FastAPI(
-    title="Production RAG API",
-    version="1.0.0"
+from rag import (
+    add_document,
+    search_documents,
+    documents
 )
 
+from llm import generate_answer
+from dotenv import load_dotenv
+load_dotenv()
 
-# =========================
+app = FastAPI(
+    title="Production RAG API"
+)
+
+# Logging
+
+logging.basicConfig(
+    level=logging.INFO
+)
+
 # CORS
-# =========================
 
 app.add_middleware(
     CORSMiddleware,
@@ -39,109 +47,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-# =========================
-# Global Services
-# =========================
-
-document_manager = None
-rag_service = None
-
-
-# =========================
-# Request Logging Middleware
-# =========================
-
-@app.middleware("http")
-async def log_requests(request, call_next):
-
-    start_time = time.time()
-
-    try:
-
-        response = await call_next(request)
-
-        process_time = round(
-            time.time() - start_time,
-            3
-        )
-
-        logger.info(
-            f"{request.method} "
-            f"{request.url.path} "
-            f"Status={response.status_code} "
-            f"Time={process_time}s"
-        )
-
-        return response
-
-    except Exception as e:
-
-        logger.error(str(e))
-
-        raise
-
-
-# =========================
-# Startup Event
-# =========================
-
-@app.on_event("startup")
-async def startup_event():
-
-    global document_manager
-    global rag_service
-
-    logger.info("Loading services...")
-
-    document_manager = DocumentManager()
-
-    rag_service = RAGService()
-
-    logger.info("Services loaded successfully")
-
-
-# =========================
-# Health Check
-# =========================
-
-@app.get("/health")
-async def health():
-
-    try:
-
-        memory = psutil.Process().memory_info().rss
-
-        memory_mb = round(
-            memory / 1024 / 1024,
-            2
-        )
-
-        return {
-            "status": "healthy",
-            "documents":
-                document_manager.get_document_count(),
-            "chunks":
-                document_manager.get_chunk_count(),
-            "memory_usage":
-                f"{memory_mb} MB",
-            "index_loaded":
-                rag_service.vectorstore is not None
-        }
-
-    except Exception as e:
-
-        logger.error(str(e))
-
-        raise HTTPException(
-            status_code=500,
-            detail=str(e)
-        )
-
-
-# =========================
+# -------------------------
 # Upload Document
-# =========================
+# -------------------------
 
 @app.post("/documents/upload")
 async def upload_document(
@@ -150,114 +58,83 @@ async def upload_document(
 
     try:
 
-        filepath = (
-            document_manager
-            .save_uploaded_file(file)
+        start = time.time()
+
+        content = await file.read()
+
+        text = content.decode("utf-8")
+
+        doc_id, chunks = add_document(
+            text,
+            file.filename
         )
 
-        result = (
-            document_manager
-            .upload_document(
-                filepath,
-                file.filename
-            )
+        logging.info(
+            f"Uploaded {file.filename}"
         )
-
-        rag_service.reload_index()
-
-        logger.info(
-            f"Document uploaded: "
-            f"{file.filename}"
-        )
-
-        return result
-
-    except Exception as e:
-
-        logger.error(str(e))
-
-        raise HTTPException(
-            status_code=500,
-            detail=str(e)
-        )
-
-
-# =========================
-# List Documents
-# =========================
-
-@app.get("/documents")
-async def list_documents():
-
-    try:
-
-        return (
-            document_manager
-            .list_documents()
-        )
-
-    except Exception as e:
-
-        logger.error(str(e))
-
-        raise HTTPException(
-            status_code=500,
-            detail=str(e)
-        )
-
-
-# =========================
-# Delete Document
-# =========================
-
-@app.delete("/documents/{document_id}")
-async def delete_document(
-    document_id: str
-):
-
-    try:
-
-        document_manager.delete_document(
-            document_id
-        )
-
-        rag_service.reload_index()
 
         return {
-            "message":
-                "Document deleted successfully"
+            "message": "Document indexed successfully",
+            "document_id": doc_id,
+            "chunks": chunks,
+            "processing_time": round(
+                time.time() - start,
+                2
+            )
         }
 
-    except ValueError as e:
+    except Exception as e:
+
+        logging.error(str(e))
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+# -------------------------
+# List Documents
+# -------------------------
+
+@app.get("/documents")
+def get_documents():
+
+    return documents
+
+# -------------------------
+# Delete Document
+# -------------------------
+
+@app.delete("/documents/{doc_id}")
+def delete_document(doc_id: str):
+
+    if doc_id not in documents:
 
         raise HTTPException(
             status_code=404,
-            detail=str(e)
+            detail="Document not found"
         )
 
-    except Exception as e:
+    del documents[doc_id]
 
-        logger.error(str(e))
+    return {
+        "message": "Document deleted"
+    }
 
-        raise HTTPException(
-            status_code=500,
-            detail=str(e)
-        )
-
-
-# =========================
+# -------------------------
 # Semantic Search
-# =========================
+# -------------------------
 
 @app.post("/search")
-async def semantic_search(
+async def search(
     request: SearchRequest
 ):
 
     try:
 
-        results = rag_service.search(
-            request.query
+        results = search_documents(
+            request.query,
+            request.top_k
         )
 
         return {
@@ -266,51 +143,73 @@ async def semantic_search(
 
     except Exception as e:
 
-        logger.error(str(e))
-
         raise HTTPException(
             status_code=500,
             detail=str(e)
         )
 
-
-# =========================
-# Ask Endpoint
-# =========================
+# -------------------------
+# Ask RAG
+# -------------------------
 
 @app.post("/ask")
-async def ask_question(
+async def ask(
     request: AskRequest
 ):
 
     try:
 
-        result = (
-            await rag_service.generate_answer(
-                request.question
+        results = search_documents(
+            request.query,
+            5
+        )
+
+        context = "\n".join(
+            [r["text"] for r in results]
+        )
+
+        answer = generate_answer(
+            request.query,
+            context
+        )
+
+        sources = list(
+            set(
+                [
+                    r["source"]
+                    for r in results
+                ]
             )
         )
 
-        return result
+        return {
+            "answer": answer,
+            "sources": sources
+        }
 
     except Exception as e:
-
-        logger.error(str(e))
 
         raise HTTPException(
             status_code=500,
             detail=str(e)
         )
 
+# -------------------------
+# Health Check
+# -------------------------
 
-# =========================
-# Root
-# =========================
+@app.get("/health")
+def health():
 
-@app.get("/")
-async def root():
+    memory = psutil.Process(
+        os.getpid()
+    ).memory_info().rss / 1024 / 1024
 
     return {
-        "message":
-            "Production RAG API Running"
+        "status": "healthy",
+        "document_count": len(documents),
+        "memory_usage_mb": round(
+            memory,
+            2
+        )
     }

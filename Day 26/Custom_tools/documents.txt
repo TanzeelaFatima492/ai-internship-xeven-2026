@@ -1,0 +1,7 @@
+Hybrid Search combines dense retrieval and sparse retrieval.
+
+RAG stands for Retrieval Augmented Generation.
+
+FAISS is a vector database used for similarity search.
+
+LangChain helps build AI applications using LLMs and tools.
