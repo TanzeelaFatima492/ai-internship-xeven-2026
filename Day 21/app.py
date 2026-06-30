@@ -25,9 +25,9 @@ from langchain_community.vectorstores import FAISS
 # Local NER (no API needed)
 from transformers import pipeline
 
-# ------------------------------
+#   --------------
 # Pydantic Entity Schema
-# ------------------------------
+#   --------------
 class Entities(BaseModel):
     persons: List[str] = Field(default_factory=list, description="People names")
     organizations: List[str] = Field(default_factory=list)
@@ -35,16 +35,16 @@ class Entities(BaseModel):
     dates: List[str] = Field(default_factory=list)
     key_terms: List[str] = Field(default_factory=list)
 
-# ------------------------------
+#   --------------
 # Page Config
-# ------------------------------
+#   --------------
 st.set_page_config(page_title="Document Analyzer", layout="wide")
 st.title("📄 Comprehensive Document Analyzer")
 st.markdown("*Upload, chunk, embed, search, extract entities, and generate a report.*")
 
-# ------------------------------
+#   --------------
 # Cached Models (load once, ~500MB download on first run)
-# ------------------------------
+#   --------------
 @st.cache_resource(show_spinner="Loading models (first time may download ~500MB)...")
 def load_models():
     emb = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
@@ -53,9 +53,9 @@ def load_models():
 
 embeddings, ner_pipeline = load_models()
 
-# ------------------------------
+#   --------------
 # Session State (persist across interactions)
-# ------------------------------
+#   --------------
 for key, default in [
     ("docs_text", ""),
     ("chunks", []),
@@ -66,9 +66,9 @@ for key, default in [
     if key not in st.session_state:
         st.session_state[key] = default
 
-# ------------------------------
+#   --------------
 # 1. Upload Section
-# ------------------------------
+#   --------------
 st.header("1. 📤 Upload Document")
 uploaded_file = st.file_uploader("Choose a PDF or TXT file", type=["pdf", "txt"])
 
@@ -135,9 +135,9 @@ if uploaded_file is not None:
             st.text("First chunk preview (500 chars):")
             st.code(st.session_state.chunks[0][:500], language=None)
 
-    # ------------------------------
+    #   --------------
     # 2. Semantic Search
-    # ------------------------------
+    #   --------------
     st.header("2. 🔎 Semantic Search")
     query = st.text_input("Search query", placeholder="e.g., functional requirements")
     k = st.slider("Results to show", 1, 10, 3)
@@ -161,9 +161,9 @@ if uploaded_file is not None:
             except Exception as e:
                 st.error(f"Search failed: {str(e)}")
 
-    # ------------------------------
+    #   --------------
     # 3. Entity Extraction
-    # ------------------------------
+    #   --------------
     st.header("3. 🧾 Extract Entities")
     if st.button("Extract Entities", help="Run NER model on first 2000 characters"):
         if not st.session_state.docs_text:
@@ -205,9 +205,9 @@ if uploaded_file is not None:
                 except Exception as e:
                     st.error(f"Extraction error: {str(e)}")
 
-    # ------------------------------
+    #   --------------
     # 4. Final Report
-    # ------------------------------
+    #   --------------
     st.header("4. 📊 Final Report")
     if st.button("Generate Report"):
         if not st.session_state.docs_text:

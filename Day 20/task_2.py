@@ -7,9 +7,9 @@ from langchain_groq import ChatGroq
 import os
 import json
 
-# -------------------
+#   ---
 # Load Environment
-# -------------------
+#   ---
 
 load_dotenv()
 
@@ -18,9 +18,9 @@ api_key = os.getenv("GROQ_API_KEY")
 if not api_key:
     raise ValueError("GROQ_API_KEY not found in .env")
 
-# -------------------
+#   ---
 # Pydantic Model
-# -------------------
+#   ---
 
 class Article(BaseModel):
     title: str
@@ -29,18 +29,18 @@ class Article(BaseModel):
     summary: str
     tags: List[str]
 
-# -------------------
+#   ---
 # LLM
-# -------------------
+#   ---
 
 llm = ChatGroq(
     model="llama-3.3-70b-versatile",
     api_key=api_key,
 )
 
-# -------------------
+#   ---
 # Raw Article
-# -------------------
+#   ---
 
 raw_text = """
 Title: AI Revolution in 2026
@@ -57,9 +57,9 @@ Tags:
 AI, technology, future
 """
 
-# -------------------
+#   ---
 # Prompt
-# -------------------
+#   ---
 
 prompt = f"""
 Extract the following article information.
@@ -81,9 +81,9 @@ Article:
 {raw_text}
 """
 
-# -------------------
+#   ---
 # Safe Parse
-# -------------------
+#   ---
 
 def safe_parse():
 
@@ -114,9 +114,9 @@ def safe_parse():
             tags=[]
         )
 
-# -------------------
+#   ---
 # Run
-# -------------------
+#   ---
 
 result = safe_parse()
 

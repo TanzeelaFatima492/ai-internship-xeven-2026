@@ -1,5 +1,5 @@
 # Task 1: Generate & Compare Embeddings
-# ---------------------------------------
+#     -------
 # pip install openai numpy matplotlib seaborn --break-system-packages
 
 import os
@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sentence_transformers import SentenceTransformer
 
-# ----------------------------------------------------------------------
+#         ------
 # 1. Cosine similarity from scratch
-# ----------------------------------------------------------------------
+#         ------
 def cosine_similarity(vec1: np.ndarray, vec2: np.ndarray) -> float:
     """
     Compute cosine similarity between two vectors.
@@ -23,9 +23,9 @@ def cosine_similarity(vec1: np.ndarray, vec2: np.ndarray) -> float:
         return 0.0   # handle zero vectors gracefully
     return dot / (norm1 * norm2)
 
-# ----------------------------------------------------------------------
+#         ------
 # 2. Generate embeddings using OpenAI API
-# ----------------------------------------------------------------------
+#         ------
 
 
 def get_embeddings(texts: list[str]) -> np.ndarray:
@@ -33,9 +33,9 @@ def get_embeddings(texts: list[str]) -> np.ndarray:
     embeddings = model.encode(texts)
     return np.array(embeddings)
 
-# ----------------------------------------------------------------------
+#         ------
 # 3. Sample sentences
-# ----------------------------------------------------------------------
+#         ------
 sentences = [
     "dog",
     "puppy",
@@ -49,9 +49,9 @@ sentences = [
     "banana"
 ]
 
-# ----------------------------------------------------------------------
+#         ------
 # 4. Main execution
-# ----------------------------------------------------------------------
+#         ------
 if __name__ == "__main__":
     # Get embeddings
     print("Fetching embeddings from OpenAI...")

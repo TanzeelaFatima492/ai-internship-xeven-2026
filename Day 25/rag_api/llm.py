@@ -24,10 +24,10 @@ You are a helpful AI assistant.
 Use ONLY the context below to answer the question.
 If answer is not in context, say "I don't know".
 
-------------------
+  --
 Context:
 {context}
-------------------
+  --
 
 Question:
 {question}

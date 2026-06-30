@@ -47,9 +47,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# -------------------------
+#   ---------
 # Upload Document
-# -------------------------
+#   ---------
 
 @app.post("/documents/upload")
 async def upload_document(
@@ -92,18 +92,18 @@ async def upload_document(
             detail=str(e)
         )
 
-# -------------------------
+#   ---------
 # List Documents
-# -------------------------
+#   ---------
 
 @app.get("/documents")
 def get_documents():
 
     return documents
 
-# -------------------------
+#   ---------
 # Delete Document
-# -------------------------
+#   ---------
 
 @app.delete("/documents/{doc_id}")
 def delete_document(doc_id: str):
@@ -121,9 +121,9 @@ def delete_document(doc_id: str):
         "message": "Document deleted"
     }
 
-# -------------------------
+#   ---------
 # Semantic Search
-# -------------------------
+#   ---------
 
 @app.post("/search")
 async def search(
@@ -148,9 +148,9 @@ async def search(
             detail=str(e)
         )
 
-# -------------------------
+#   ---------
 # Ask RAG
-# -------------------------
+#   ---------
 
 @app.post("/ask")
 async def ask(
@@ -194,9 +194,9 @@ async def ask(
             detail=str(e)
         )
 
-# -------------------------
+#   ---------
 # Health Check
-# -------------------------
+#   ---------
 
 @app.get("/health")
 def health():
