@@ -5,6 +5,8 @@ from app import models, schemas
 from app.dependencies import get_db
 from app.utils.hashing import hash_password
 
+from app.dependencies import get_current_user
+
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"]
@@ -41,3 +43,12 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.refresh(new_user)
 
     return new_user
+
+@router.get("/me")
+def get_profile(
+    current_user=Depends(get_current_user)
+):
+    return {
+        "message": "Protected Route",
+        "user": current_user
+    }
