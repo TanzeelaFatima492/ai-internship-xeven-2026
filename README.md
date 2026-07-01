@@ -64,7 +64,7 @@ The goal of this internship is to learn how to build scalable backend systems us
 - Token verification
 - Protected routes using `OAuth2PasswordBearer`
 
-### 📘 Day 29–32: Chatbot API Development
+### Chatbot API Development
 - Built Chat API (`POST /chat`)
 - Dummy chatbot response system:
   ```text
@@ -72,42 +72,7 @@ The goal of this internship is to learn how to build scalable backend systems us
   ```
 - Stored chat conversations in PostgreSQL
 - Linked messages with user ID
-
-### 📘 Day 33–Present: Full Project Integration
-- Integrated all modules: Authentication, JWT security, Chat API, Database storage
-- Project structure organized into:
-  ```text
-  app/
-  ├── main.py
-  ├── database.py
-  ├── models.py
-  ├── schemas.py
-  ├── routers/
-  ├── services/
-  └── utils/
-  ```
-- Testing APIs using Swagger UI (`/docs`)
-
----
-
-## 🧩 Features Implemented
-
-### 🔐 Authentication
-- User registration
-- Secure login system
-- Password hashing
-- JWT token authentication
-
-### 💬 Chat System
-- Simple chatbot API
-- User-based conversation storage
-- PostgreSQL persistence
-
-### 🗄️ Database
-- PostgreSQL integration
-- SQLAlchemy ORM models
-- Relationships (User ↔ Conversations)
-
+  
 ## ⚙️ Tech Stack
 
 - Python 🐍
@@ -119,14 +84,6 @@ The goal of this internship is to learn how to build scalable backend systems us
 - Passlib (bcrypt)
 - Uvicorn
 
-## 📂 API Endpoints
-
-| Method | Endpoint          | Description                |
-|--------|-------------------|-----------------------------|
-| POST   | `/auth/register`  | Register new user           |
-| POST   | `/auth/login`      | Login user & get JWT        |
-| POST   | `/chat`            | Send message to chatbot     |
-| GET    | `/chat/history`    | Get user chat history       |
 
 ## 🎯 Key Learning Outcomes
 
