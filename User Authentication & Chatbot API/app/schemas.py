@@ -14,6 +14,7 @@ class UserResponse(BaseModel):
     id: int
     full_name: str
     email: str
+    bot_id: int                    # ← Bot ID = User ID
     created_at: datetime | None = None
 
     class Config:
@@ -30,7 +31,8 @@ class ConversationResponse(BaseModel):
     id: int
     user_message: str
     bot_response: str
-    user_id: int | None = None
+    user_id: int
+    bot_id: int                    # ← Bot ID in every response
     created_at: datetime | None = None
 
     class Config:

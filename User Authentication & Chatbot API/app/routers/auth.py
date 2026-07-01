@@ -31,7 +31,7 @@ def create_token(user_id: int):
     payload = {"user_id": user_id, "exp": expire}
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
-@router.post("/signup", response_model=dict)
+@router.post("/signup", response_model=UserResponse)
 def signup(user: UserCreate, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == user.email).first()
     if existing:
@@ -49,7 +49,14 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_user)
     
-    return {"message": "User registered successfully"}
+    # Return user with bot_id = user.id
+    return {
+        "id": db_user.id,
+        "full_name": db_user.full_name,
+        "email": db_user.email,
+        "bot_id": db_user.id,        # ← Bot ID = User ID
+        "created_at": db_user.created_at
+    }
 
 @router.post("/login", response_model=TokenResponse)
 def login(user: UserLogin, db: Session = Depends(get_db)):
