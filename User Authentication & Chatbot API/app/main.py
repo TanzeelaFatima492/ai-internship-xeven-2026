@@ -1,14 +1,17 @@
-from fastapi import APIRouter
+from fastapi import FastAPI
 
-from app.schemas import ChatRequest, ChatResponse
-from app.services.chatbot import chatbot_response
+from app.database import Base, engine
+from app import models
+from app.routers import auth, chat
 
-router = APIRouter(
-    prefix="/chat",
-    tags=["Chatbot"]
-)
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="User Authentication & Chatbot API")
+
+app.include_router(auth.router)
+app.include_router(chat.router)
 
 
-@router.post("/", response_model=ChatResponse)
-def chat(request: ChatRequest):
-    return chatbot_response(request.message)
+@app.get("/")
+def home():
+    return {"message": "User Authentication & Chatbot API is Running!"}
