@@ -21,11 +21,13 @@ def chat(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    reply = f"Echo: {data.message}"
+    # Generate bot response
+    user_msg = data.message
+    reply = f"Hello! You said: {user_msg}"  # ← Always respond
     
     conversation = Conversation(
         user_id=current_user.id,
-        user_message=data.message,
+        user_message=user_msg,
         bot_response=reply
     )
     
@@ -33,13 +35,12 @@ def chat(
     db.commit()
     db.refresh(conversation)
     
-    # Return with user_id and bot_id (both same)
     return {
         "id": conversation.id,
         "user_message": conversation.user_message,
         "bot_response": conversation.bot_response,
         "user_id": current_user.id,
-        "bot_id": current_user.id,      # ← Bot ID = User ID
+        "bot_id": current_user.id,
         "created_at": conversation.created_at
     }
 
@@ -58,7 +59,7 @@ def get_history(
             "user_message": c.user_message,
             "bot_response": c.bot_response,
             "user_id": current_user.id,
-            "bot_id": current_user.id,   # ← Bot ID = User ID
+            "bot_id": current_user.id,
             "created_at": c.created_at
         }
         for c in conversations
