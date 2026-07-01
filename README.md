@@ -1,169 +1,174 @@
-# 🚀 AI Engineer Internship Project - Xeven Solutions
+# 🚀 AI Engineering Internship – Xeven Solutions
 
-## 📌 Project Title
-User Authentication & Chatbot API using FastAPI + PostgreSQL
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-⚡-009688?style=flat&logo=fastapi&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-🐘-336791?style=flat&logo=postgresql&logoColor=white)
+![JWT](https://img.shields.io/badge/Auth-JWT-black?style=flat&logo=jsonwebtokens&logoColor=white)
+![Status](https://img.shields.io/badge/Status-In%20Progress-yellow?style=flat)
 
----
-
-## 📖 About the Internship
-
-This project is part of my **AI Engineer Internship at Xeven Solutions**.
-The goal of this internship is to build a **real-world backend system** using modern Python technologies, focusing on authentication, database design, and API development.
-
----
-
-## 🎯 Objective
-
-Build a backend system that provides:
-
-- User Registration (Sign Up)
-- User Login (Authentication)
-- JWT Token-based Security
-- Chatbot API (Dummy AI Response)
-- Store Chat History in PostgreSQL
-- Retrieve User-specific Chat History
+👩‍💻 **Intern:** Tanzeela Fatima
+📍 **Program:** AI Engineer Internship
+🏢 **Company:** Xeven Solutions
+📅 **Duration:** Internship Progress (Day 1 → Current)
 
 ---
 
-## 🛠️ Tech Stack
+## 📌 Overview
 
-- **FastAPI** - Backend Framework
-- **PostgreSQL** - Database
-- **SQLAlchemy** - ORM
-- **Pydantic** - Data Validation
-- **JWT (python-jose)** - Authentication
-- **Passlib (bcrypt)** - Password Hashing
-- **Uvicorn** - ASGI Server
+This repository contains my complete learning journey during the AI Engineer Internship at Xeven Solutions. It includes hands-on practice, backend development using FastAPI, database integration with PostgreSQL, authentication systems, and building a Chatbot API.
+
+The goal of this internship is to learn how to build scalable backend systems using modern Python technologies.
 
 ---
 
-## 📂 Project Structure
+## 🧠 What I Learned (Day-by-Day Progress)
 
-```
-app/
-├── main.py
-├── database.py
-├── models.py
-├── schemas.py
-├── routers/
-│   ├── auth.py
-│   └── chat.py
-├── services/
-│   └── chatbot.py
-├── utils/
-│   ├── hashing.py
-│   └── token.py
-└── dependencies.py
-```
+### 📘 Day 1–3: Python & Backend Fundamentals
+- Python basics revision
+- Functions, loops, conditions
+- Understanding backend concepts
+- API basics (Request/Response cycle)
 
----
+### 📘 Day 4–6: Data Structures & Problem Solving
+- Arrays, strings, hashing
+- LeetCode practice problems
+- Logical thinking improvement
+- Basic DSA challenges (Move Zeroes, 3Sum, etc.)
 
-## ⚙️ Features
+### 📘 Day 7–10: Introduction to FastAPI
+- What is FastAPI?
+- Creating first API endpoints
+- Understanding path & query parameters
+- Swagger UI (`/docs`) usage
+- Basic routing system
 
-### 🔐 Authentication System
-- User Signup (`/auth/register`)
-- User Login (`/auth/login`)
-- Password hashing using bcrypt
-- JWT token generation
+### 📘 Day 11–15: Database Fundamentals (PostgreSQL)
+- Introduction to databases
+- Tables, rows, primary & foreign keys
+- PostgreSQL setup
+- Creating database: `chatbot_db`
+- Connecting FastAPI with PostgreSQL using SQLAlchemy
 
----
+### 📘 Day 16–20: SQLAlchemy ORM
+- Creating models (`User`, `Conversation`)
+- Relationships: One-to-Many (User → Conversations)
+- Database session management
+- CRUD operations
 
-### 💬 Chatbot API
-- Endpoint: `/chat/`
-- Accepts user message
-- Returns dummy response:
+### 📘 Day 21–25: Authentication System
+- User Registration API (`/auth/register`)
+- User Login API (`/auth/login`)
+- Password hashing using bcrypt (passlib)
+- Input validation using Pydantic schemas
+- Duplicate email handling
 
-```
-Hello! How can I help you today?
-```
+### 📘 Day 26–28: JWT Authentication
+- JSON Web Token (JWT) concept
+- Token generation using `python-jose`
+- Token verification
+- Protected routes using `OAuth2PasswordBearer`
 
-- Stores chat history in PostgreSQL
+### 📘 Day 29–32: Chatbot API Development
+- Built Chat API (`POST /chat`)
+- Dummy chatbot response system:
+  ```text
+  Hello! How can I help you today?
+  ```
+- Stored chat conversations in PostgreSQL
+- Linked messages with user ID
 
----
-
-### 🗂️ Chat History
-- Each message is saved in database
-- Linked with user using Foreign Key
-- Users can retrieve their chat history
-
----
-
-## 🧪 API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | /auth/register | Register new user |
-| POST | /auth/login | Login user & get JWT |
-| POST | /chat/ | Send message to chatbot |
-| GET | /chat/history | Get user chat history |
-
----
-
-## 🗄️ Database Schema
-
-### Users Table
-- id (Primary Key)
-- username
-- email (Unique)
-- password (Hashed)
-
-### Conversations Table
-- id
-- user_message
-- bot_response
-- user_id (Foreign Key)
+### 📘 Day 33–Present: Full Project Integration
+- Integrated all modules: Authentication, JWT security, Chat API, Database storage
+- Project structure organized into:
+  ```text
+  app/
+  ├── main.py
+  ├── database.py
+  ├── models.py
+  ├── schemas.py
+  ├── routers/
+  ├── services/
+  └── utils/
+  ```
+- Testing APIs using Swagger UI (`/docs`)
 
 ---
 
-## 🚀 How to Run the Project
+## 🧩 Features Implemented
 
-### 1. Install dependencies
-```bash
-pip install -r requirements.txt
-```
+### 🔐 Authentication
+- User registration
+- Secure login system
+- Password hashing
+- JWT token authentication
 
-### 2. Start PostgreSQL
-Create database:
+### 💬 Chat System
+- Simple chatbot API
+- User-based conversation storage
+- PostgreSQL persistence
 
-```sql
-CREATE DATABASE chatbot_db;
-```
-
-### 3. Run server
-
-```bash
-uvicorn app.main:app --reload
-```
-
-### 4. Open API docs
-
-```
-http://127.0.0.1:8000/docs
-```
+### 🗄️ Database
+- PostgreSQL integration
+- SQLAlchemy ORM models
+- Relationships (User ↔ Conversations)
 
 ---
 
-## 📚 Learning Outcomes
+## ⚙️ Tech Stack
 
-Through this internship, I learned:
-
-- FastAPI backend development
-- PostgreSQL database integration
-- SQLAlchemy ORM relationships
-- JWT authentication system
-- Secure password hashing
-- REST API design principles
+- Python 🐍
+- FastAPI ⚡
+- PostgreSQL 🐘
+- SQLAlchemy
+- Pydantic
+- JWT (python-jose)
+- Passlib (bcrypt)
+- Uvicorn
 
 ---
 
-## 🏢 Organization
-Xeven Solutions Internship Program
+## 📂 API Endpoints
 
-## 👩‍💻 Author
-**Tanzeela Fatima**
-Information Technology Undergraduate
-GitHub: https://github.com/Fatima-progmmer
-LinkedIn: https://www.linkedin.com/in/tanzeela-fatima-47861b2b7/
+| Method | Endpoint          | Description                |
+|--------|-------------------|-----------------------------|
+| POST   | `/auth/register`  | Register new user           |
+| POST   | `/auth/login`      | Login user & get JWT        |
+| POST   | `/chat`            | Send message to chatbot     |
+| GET    | `/chat/history`    | Get user chat history       |
 
-## ⭐ Status
-🚧 Project is currently under development as part of internship tasks.
+---
+
+## 🎯 Key Learning Outcomes
+
+- Backend API development with FastAPI
+- Real-world authentication systems
+- JWT-based security implementation
+- PostgreSQL database design
+- ORM relationships (One-to-Many)
+- Building production-style project structure
+
+---
+
+## 🚧 Challenges Faced
+
+- Database connection issues
+- Model mismatch errors
+- 500 Internal Server Errors debugging
+- JWT implementation understanding
+- Dependency injection in FastAPI
+
+---
+
+## 📈 Future Improvements
+
+- Integrate real AI chatbot (OpenAI API)
+- Add frontend UI (React/Next.js)
+- Add pagination for chat history
+- Add logging & monitoring
+- Write unit tests (pytest)
+
+---
+
+## 🙌 Acknowledgment
+
+Special thanks to **Xeven Solutions** for providing this internship opportunity and guiding me through real-world backend development.
