@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from app.schemas import ChatRequest, ChatResponse
-from app.services.chatbot import chatbot_response
+from app.services.chatbot import chatbot_reply
 
 router = APIRouter(
     prefix="/chat",
@@ -11,4 +11,5 @@ router = APIRouter(
 
 @router.post("/", response_model=ChatResponse)
 def chat(request: ChatRequest):
-    return chatbot_response(request.message)
+    response = chatbot_reply(request.message)
+    return ChatResponse(reply=response)
