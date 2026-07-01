@@ -1,28 +1,37 @@
 from pydantic import BaseModel, EmailStr
-
+from datetime import datetime
 
 class UserCreate(BaseModel):
-    username: str
+    full_name: str
     email: EmailStr
     password: str
-
 
 class UserLogin(BaseModel):
-    email: EmailStr
+    email: str
     password: str
-
 
 class UserResponse(BaseModel):
     id: int
-    username: str
-    email: EmailStr
+    full_name: str
+    email: str
+    created_at: datetime | None = None
 
     class Config:
         from_attributes = True
 
-class ChatRequest(BaseModel):
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
+
+class ConversationCreate(BaseModel):
     message: str
 
+class ConversationResponse(BaseModel):
+    id: int
+    user_message: str
+    bot_response: str
+    user_id: int | None = None
+    created_at: datetime | None = None
 
-class ChatResponse(BaseModel):
-    reply: str
+    class Config:
+        from_attributes = True

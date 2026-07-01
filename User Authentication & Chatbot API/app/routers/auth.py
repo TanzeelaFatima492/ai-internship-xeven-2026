@@ -1,136 +1,66 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from app.database import SessionLocal
+from app.models import User
+from app.schemas import UserCreate, UserLogin, UserResponse, TokenResponse
+import bcrypt
+from jose import jwt
+import os
+from datetime import datetime, timedelta, timezone
 
-from app import models, schemas
-from app.dependencies import get_db
-from app.utils.hashing import hash_password, verify_password
+router = APIRouter()
 
-from app.utils.token import create_access_token
+SECRET_KEY = os.getenv("SECRET_KEY", "mysecretkey")
+ALGORITHM = "HS256"
 
-router = APIRouter(
-    prefix="/auth",
-    tags=["Authentication"]
-)
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
-# ----------------------------
-# Register User
-# ----------------------------
-@router.post("/register", response_model=schemas.UserResponse)
-def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
+def verify_password(password: str, hashed: str) -> bool:
+    return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
 
-    # Check if email already exists
-    existing_user = db.query(models.User).filter(
-        models.User.email == user.email
-    ).first()
+def create_token(user_id: int):
+    expire = datetime.now(timezone.utc) + timedelta(hours=24)
+    payload = {"user_id": user_id, "exp": expire}
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
-    if existing_user:
-        raise HTTPException(
-            status_code=400,
-            detail="Email already registered"
-        )
-
-    # Create new user
-    new_user = models.User(
-        username=user.username,
+@router.post("/signup", response_model=dict)
+def signup(user: UserCreate, db: Session = Depends(get_db)):
+    existing = db.query(User).filter(User.email == user.email).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    hashed_password = hash_password(user.password)
+    
+    db_user = User(
+        full_name=user.full_name,
         email=user.email,
-        password=hash_password(user.password)
+        password=hashed_password
     )
-
-    db.add(new_user)
+    
+    db.add(db_user)
     db.commit()
-    db.refresh(new_user)
+    db.refresh(db_user)
+    
+    return {"message": "User registered successfully"}
 
-    return new_user
-
-
-# ----------------------------
-# Login User
-@router.post("/login")
-def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
-
-    existing_user = db.query(models.User).filter(
-        models.User.email == user.email
-    ).first()
-
-    if not existing_user:
-        raise HTTPException(
-            status_code=404,
-            detail="User not found"
-        )
-
-    if not verify_password(
-        user.password,
-        existing_user.password
-    ):
-        raise HTTPException(
-            status_code=401,
-            detail="Incorrect password"
-        )
-
-    access_token = create_access_token(
-        data={
-            "sub": existing_user.email
-        }
-    )
-
+@router.post("/login", response_model=TokenResponse)
+def login(user: UserLogin, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.email == user.email).first()
+    
+    if not db_user or not verify_password(user.password, db_user.password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    token = create_token(db_user.id)
+    
     return {
-        "access_token": access_token,
+        "access_token": token,
         "token_type": "bearer"
-    }
-
-    existing_user = db.query(models.User).filter(
-        models.User.email == user.email
-    ).first()
-
-    if not existing_user:
-        raise HTTPException(
-            status_code=404,
-            detail="User not found"
-        )
-
-    if not verify_password(
-        user.password,
-        existing_user.password
-    ):
-        raise HTTPException(
-            status_code=401,
-            detail="Incorrect password"
-        )
-
-    return {
-        "message": "Login Successful",
-        "user": {
-            "id": existing_user.id,
-            "username": existing_user.username,
-            "email": existing_user.email
-        }
-    }
-
-    existing_user = db.query(models.User).filter(
-        models.User.email == user.email
-    ).first()
-
-    if not existing_user:
-        raise HTTPException(
-            status_code=404,
-            detail="User not found"
-        )
-
-    if not verify_password(
-    user.password,
-    existing_user.password
-):
-        raise HTTPException(
-            status_code=401,
-            detail="Incorrect password"
-        )
-
-    return {
-        "message": "Login Successful",
-        "user": {
-            "id": existing_user.id,
-            "username": existing_user.username,
-            "email": existing_user.email
-        }
     }

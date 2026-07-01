@@ -1,4 +1,2 @@
-def chatbot_response(message: str):
-    return {
-        "reply": f"You said: {message}"
-    }
+def chatbot_reply(message: str):
+    return f"Bot: You said '{message}'"
