@@ -11,15 +11,11 @@
 🏢 **Company:** Xeven Solutions
 📅 **Duration:** Internship Progress (Day 1 → Current)
 
----
-
 ## 📌 Overview
 
 This repository contains my complete learning journey during the AI Engineer Internship at Xeven Solutions. It includes hands-on practice, backend development using FastAPI, database integration with PostgreSQL, authentication systems, and building a Chatbot API.
 
 The goal of this internship is to learn how to build scalable backend systems using modern Python technologies.
-
----
 
 ## 🧠 What I Learned (Day-by-Day Progress)
 
@@ -112,8 +108,6 @@ The goal of this internship is to learn how to build scalable backend systems us
 - SQLAlchemy ORM models
 - Relationships (User ↔ Conversations)
 
----
-
 ## ⚙️ Tech Stack
 
 - Python 🐍
@@ -125,8 +119,6 @@ The goal of this internship is to learn how to build scalable backend systems us
 - Passlib (bcrypt)
 - Uvicorn
 
----
-
 ## 📂 API Endpoints
 
 | Method | Endpoint          | Description                |
@@ -135,8 +127,6 @@ The goal of this internship is to learn how to build scalable backend systems us
 | POST   | `/auth/login`      | Login user & get JWT        |
 | POST   | `/chat`            | Send message to chatbot     |
 | GET    | `/chat/history`    | Get user chat history       |
-
----
 
 ## 🎯 Key Learning Outcomes
 
@@ -147,8 +137,6 @@ The goal of this internship is to learn how to build scalable backend systems us
 - ORM relationships (One-to-Many)
 - Building production-style project structure
 
----
-
 ## 🚧 Challenges Faced
 
 - Database connection issues
@@ -157,8 +145,6 @@ The goal of this internship is to learn how to build scalable backend systems us
 - JWT implementation understanding
 - Dependency injection in FastAPI
 
----
-
 ## 📈 Future Improvements
 
 - Integrate real AI chatbot (OpenAI API)
@@ -166,8 +152,6 @@ The goal of this internship is to learn how to build scalable backend systems us
 - Add pagination for chat history
 - Add logging & monitoring
 - Write unit tests (pytest)
-
----
 
 ## 🙌 Acknowledgment
 
