@@ -21,7 +21,7 @@ class Conversation(Base):
     __tablename__ = "conversations"
 
     id = Column(Integer, primary_key=True, index=True)
-    bot_id = Column(Integer, nullable=True) 
+    bot_id = Column(String, nullable=True) 
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     user_message = Column(Text)
     bot_response = Column(Text)
