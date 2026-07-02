@@ -21,13 +21,12 @@ def chat(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    # Generate bot response
-    user_msg = data.message
-    reply = f"Hello! You said: {user_msg}"  # ← Always respond
+    reply = f"Hello! You said: {data.message}"
     
     conversation = Conversation(
         user_id=current_user.id,
-        user_message=user_msg,
+        bot_id=current_user.id,        # ← YEH LINE HONI CHAHIYE
+        user_message=data.message,
         bot_response=reply
     )
     
