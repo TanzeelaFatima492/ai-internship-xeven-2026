@@ -26,10 +26,10 @@ class TokenResponse(BaseModel):
 
 class ConversationCreate(BaseModel):
     query: str              
-    bot_id: str = ""        
+    bot_id: int = 0        
 
 class ConversationResponse(BaseModel):
-    bot_id: str | None = None
+    bot_id: int | None = None
     user_id: int | None = None
     
     class Config:

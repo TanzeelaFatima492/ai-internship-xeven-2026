@@ -5,7 +5,7 @@ from app.database import SessionLocal
 from app.models import Conversation, User
 from app.schemas import ConversationCreate, ConversationResponse
 from app.utils.token import get_current_user
-import uuid
+import random
 
 router = APIRouter(prefix="/chat", tags=["Chatbot"])
 
@@ -25,18 +25,17 @@ def chat(
     user_msg = data.query
     bot_id = data.bot_id
     
-    # Pehli call → naya bot_id generate karo
-    if not bot_id:
-        new_bot_id = str(uuid.uuid4()).replace("-", "")[:20]  # "389982399239323"
+    # Pehli call (bot_id == 0) → naya bot_id generate
+    if bot_id == 0:
+        new_bot_id = random.randint(100000000000000, 999999999999999)  # 15-digit integer
         reply = "Hi, how can I help you?"
     else:
-        # Existing conversation → bot_id null return karo
         new_bot_id = None
         reply = f"Echo: {user_msg}"
     
     conversation = Conversation(
         user_id=current_user.id,
-        bot_id=bot_id if bot_id else new_bot_id,
+        bot_id=bot_id if bot_id != 0 else new_bot_id,
         user_message=user_msg,
         bot_response=reply
     )
