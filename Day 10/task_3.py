@@ -3,6 +3,18 @@ import os
 
 CONFIG_FILE = "config.json"
 
+default_config = {
+    "database": {
+        "host": "localhost",
+        "port": 5432,
+        "name": "mydb"
+    },
+    "api": {
+        "key": "default_key",
+        "timeout": 30
+    }
+}
+
 def load_config():
     if os.path.exists(CONFIG_FILE):
         with open(CONFIG_FILE, "r") as file:
