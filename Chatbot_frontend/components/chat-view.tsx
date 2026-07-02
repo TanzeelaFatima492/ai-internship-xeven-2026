@@ -35,7 +35,7 @@ export function ChatView({
   const [userId, setUserId] = useState<string>(
     user?.id !== undefined ? String(user.id) : "—",
   )
-  const [botId, setBotId] = useState<string>("assistant")
+  const [botId, setBotId] = useState<number>(0)
 
   const active = conversations.find((c) => c.id === activeId) ?? null
 
@@ -93,6 +93,7 @@ export function ChatView({
     setConversations((prev) => prev.map((c) => (c.id === id ? updater(c) : c)))
   }
 
+
   async function handleSend(text: string) {
     setError(null)
     let convoId = activeId
@@ -117,25 +118,28 @@ export function ChatView({
 
     setSending(true)
     try {
-      const { reply, userId: uid, botId: bid } = await sendMessage(text)
-      if (uid) setUserId(uid)
-      if (bid) setBotId(bid)
+      const { response, userId: uid, botId: bid } = await sendMessage(text, botId)
+      if (uid) setUserId(String(uid))
+      if (bid && bid !== 0) setBotId(bid)
 
+      // ✅ ADD BOT RESPONSE TO MESSAGES
       const botMsg: ChatMessage = {
         id: nextId(),
         role: "bot",
-        content: reply || "(no response)",
+        content: response || "(no response)",
       }
-      updateConversation(convoId, (c) => ({
+
+      updateConversation(convoId!, (c) => ({
         ...c,
         messages: [...c.messages, botMsg],
       }))
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to send message.")
+      setError(err instanceof Error ? err.message : "Failed to send message")
     } finally {
       setSending(false)
     }
   }
+
 
   return (
     <div className="flex h-dvh overflow-hidden bg-background">
@@ -173,7 +177,7 @@ export function ChatView({
           <div className="flex items-center gap-3">
             <div className="hidden items-center gap-2 text-xs sm:flex">
               <IdPill label="User" value={userId} />
-              <IdPill label="Bot" value={botId} />
+              <IdPill label="Bot" value={String(botId)} />
             </div>
             <ThemeToggle />
           </div>

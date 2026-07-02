@@ -80,7 +80,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
             : "rounded-bl-sm bg-muted text-foreground"
         }`}
       >
-        <p className="whitespace-pre-wrap break-words">{message.content}</p>
+        <p className="whitespace-pre-wrap wrap-break-words">{message.content}</p>
       </div>
     </div>
   )

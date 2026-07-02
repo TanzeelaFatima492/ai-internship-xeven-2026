@@ -142,20 +142,23 @@ export async function login(payload: { email: string; password: string }) {
   return { token, user, raw: data }
 }
 
-export async function sendMessage(query: string, botId: string = "") {
+export async function sendMessage(query: string, botId: number = 0) {
   const data = await request<Record<string, unknown>>(
     "/chat/",
     {
       method: "POST",
-      body: JSON.stringify({ query, bot_id: botId }),
+      body: JSON.stringify({ 
+        query: query,        //query bhejo
+        bot_id: botId        //integer bot_id bhejo (0 for new chat)
+      }),
     },
     true,
   )
 
   return {
-    response: (data.response as string) || "",
-    botId: (data.bot_id as string) ?? undefined,
-    userId: (data.user_id as string) ?? undefined,
+    response: (data.response as string) || "",   // "response" field
+    botId: (data.bot_id as number) ?? 0,
+    userId: (data.user_id as number) ?? 0,
   }
 }
 
@@ -170,6 +173,7 @@ export async function getHistory(): Promise<ChatMessage[]> {
 
   const messages: ChatMessage[] = []
   ;(list as Record<string, unknown>[]).forEach((item, i) => {
+
     // A history item may be a single message or a {message, response} pair.
     const userText =
       (item.message as string) ??
