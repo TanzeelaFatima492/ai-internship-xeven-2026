@@ -142,29 +142,20 @@ export async function login(payload: { email: string; password: string }) {
   return { token, user, raw: data }
 }
 
-export async function sendMessage(message: string) {
+export async function sendMessage(query: string, botId: string = "") {
   const data = await request<Record<string, unknown>>(
     "/chat/",
     {
       method: "POST",
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ query, bot_id: botId }),
     },
     true,
   )
 
-  const reply =
-    (data.bot_response as string) ||      // ← YOUR BACKEND RETURNS THIS
-    (data.response as string) ||
-    (data.reply as string) ||
-    (data.message as string) ||
-    (data.answer as string) ||
-    (typeof data === "string" ? data : "")
-
   return {
-    reply,
-    userId: (data.user_id as string) ?? undefined,
+    response: (data.response as string) || "",
     botId: (data.bot_id as string) ?? undefined,
-    raw: data,
+    userId: (data.user_id as string) ?? undefined,
   }
 }
 
