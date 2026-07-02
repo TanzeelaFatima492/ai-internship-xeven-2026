@@ -25,15 +25,12 @@ class TokenResponse(BaseModel):
     token_type: str
 
 class ConversationCreate(BaseModel):
-    message: str
+    query: str              
+    bot_id: str = ""        
 
 class ConversationResponse(BaseModel):
-    id: int
-    user_message: str
-    bot_response: str
-    user_id: int
-    bot_id: int                    # ← Bot ID in every response
-    created_at: datetime | None = None
-
+    bot_id: str | None = None
+    user_id: int | None = None
+    
     class Config:
         from_attributes = True
