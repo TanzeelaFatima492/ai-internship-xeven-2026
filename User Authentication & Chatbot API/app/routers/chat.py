@@ -50,6 +50,7 @@ def chat(
     }
 
 @router.get("/history", response_model=List[ConversationResponse])
+@router.get("/history", response_model=List[ConversationResponse])
 def get_history(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -61,6 +62,7 @@ def get_history(
     return [
         {
             "response": c.bot_response,
+            "user_message": c.user_message,      # ← ADD THIS
             "bot_id": c.bot_id,
             "user_id": c.user_id
         }

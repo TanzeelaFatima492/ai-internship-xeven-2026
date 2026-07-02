@@ -30,6 +30,7 @@ class ConversationCreate(BaseModel):
 
 class ConversationResponse(BaseModel):
     response: str 
+    user_message: str | None = None
     bot_id: int | None = None
     user_id: int | None = None
     
