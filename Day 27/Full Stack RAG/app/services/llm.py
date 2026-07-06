@@ -6,53 +6,46 @@ load_dotenv()
 
 class LLMService:
     def __init__(self):
-        self.api_key = os.getenv("GROK_API_KEY")
+        self.api_key = os.getenv("OPENROUTER_API_KEY")
         
         if self.api_key:
             self.client = OpenAI(
                 api_key=self.api_key,
-                base_url="https://api.x.ai/v1"
+                base_url="https://openrouter.ai/api/v1"
             )
-            self.model = "grok-2-latest"
-            print("✅ Grok AI ready")
+            self.model = "deepseek/deepseek-r1:free"
+            print("✅ OpenRouter FREE ready")
         else:
-            print("⚠️ No Grok API key found — using fallback mode")
+            print("⚠️ No key — fallback mode")
     
     def generate_answer(self, question, context_chunks):
         if not self.api_key:
             return self._fallback(question, context_chunks)
         
-        context_text = "\n\n".join([
-            f"[Source {i+1}]:\n{chunk}" 
-            for i, chunk in enumerate(context_chunks)
-        ])
+        context_text = "\n\n".join([f"[{i+1}]: {chunk}" for i, chunk in enumerate(context_chunks)])
         
-        prompt = f"""You are a helpful restaurant assistant. Answer based ONLY on the menu below.
-If not in the menu, say "I don't have this information in the menu."
+        prompt = f"""Answer ONLY from this menu. Be specific, include prices.
 
-MENU CONTEXT:
+MENU:
 {context_text}
 
-CUSTOMER QUESTION: {question}
+QUESTION: {question}
 
-ANSWER (be specific, include prices):"""
+ANSWER:"""
 
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
-                messages=[
-                    {"role": "system", "content": "You are a precise restaurant assistant."},
-                    {"role": "user", "content": prompt}
-                ],
+                messages=[{"role": "user", "content": prompt}],
                 temperature=0.3,
-                max_tokens=300
+                max_tokens=200
             )
             return response.choices[0].message.content
         except Exception as e:
-            print(f"⚠️ Grok error: {e}")
+            print(f"⚠️ Error: {e}")
             return self._fallback(question, context_chunks)
     
     def _fallback(self, question, context_chunks):
-        return f"📋 Found these relevant menu items:\n\n" + "\n---\n".join(context_chunks[:3])
+        return "📋 Found:\n\n" + "\n---\n".join(context_chunks[:3])
 
 llm_service = LLMService()
