@@ -62,3 +62,17 @@ class IndexManager:
         )
 
         print("FAISS index saved successfully.")
+
+    def add_vectors(
+    self,
+    embeddings,
+    chunks
+       ):
+
+    start_id = self.index.ntotal
+
+    self.index.add(embeddings)
+
+    for i, chunk in enumerate(chunks):
+
+        self.mapping[str(start_id + i)] = chunk
