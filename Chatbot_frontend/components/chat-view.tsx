@@ -35,7 +35,15 @@ export function ChatView({
   const [userId, setUserId] = useState<string>(
     user?.id !== undefined ? String(user.id) : "—",
   )
-  const [botId, setBotId] = useState<number>(0)
+  
+  // ✅ Restore botId from localStorage on load
+  const [botId, setBotId] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("chat_bot_id")
+      return saved ? Number(saved) : 0
+    }
+    return 0
+  })
 
   const active = conversations.find((c) => c.id === activeId) ?? null
 
@@ -46,6 +54,7 @@ export function ChatView({
       try {
         const history = await getHistory()
         if (cancelled) return
+        
         if (history.length > 0) {
           const convo: Conversation = {
             id: nextId(),
@@ -54,6 +63,12 @@ export function ChatView({
           }
           setConversations([convo])
           setActiveId(convo.id)
+          
+          // ✅ Restore botId from saved value (not 0)
+          const savedBotId = localStorage.getItem("chat_bot_id")
+          if (savedBotId) {
+            setBotId(Number(savedBotId))
+          }
         } else {
           startNewChat()
         }
@@ -71,7 +86,6 @@ export function ChatView({
     return () => {
       cancelled = true
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   function startNewChat() {
@@ -81,18 +95,18 @@ export function ChatView({
       messages: [],
     }
     setConversations((prev) => {
-      // Avoid stacking multiple empty chats.
       const withoutEmpty = prev.filter((c) => c.messages.length > 0)
       return [convo, ...withoutEmpty]
     })
     setActiveId(convo.id)
+    setBotId(0)
+    localStorage.removeItem("chat_bot_id")  // ✅ Clear saved botId
     setSidebarOpen(false)
   }
 
   function updateConversation(id: string, updater: (c: Conversation) => Conversation) {
     setConversations((prev) => prev.map((c) => (c.id === id ? updater(c) : c)))
   }
-
 
   async function handleSend(text: string) {
     setError(null)
@@ -120,9 +134,13 @@ export function ChatView({
     try {
       const { response, userId: uid, botId: bid } = await sendMessage(text, botId)
       if (uid) setUserId(String(uid))
-      if (bid && bid !== 0) setBotId(bid)
+      
+      // ✅ Save botId for conversation continuity
+      if (bid && bid !== 0) {
+        setBotId(bid)
+        localStorage.setItem("chat_bot_id", String(bid))
+      }
 
-      // ✅ ADD BOT RESPONSE TO MESSAGES
       const botMsg: ChatMessage = {
         id: nextId(),
         role: "bot",
@@ -139,7 +157,6 @@ export function ChatView({
       setSending(false)
     }
   }
-
 
   return (
     <div className="flex h-dvh overflow-hidden bg-background">
