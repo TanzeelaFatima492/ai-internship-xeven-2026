@@ -31,7 +31,7 @@ def chat(
         reply = "Hi, how can I help you?"
     else:
         new_bot_id = None
-        reply = f"Echo: {user_msg}"
+        reply = f"You said : {user_msg}"
     
     conversation = Conversation(
         user_id=current_user.id,
@@ -62,7 +62,7 @@ def get_history(
     return [
         {
             "response": c.bot_response,
-            "user_message": c.user_message,      # ← ADD THIS
+            "user_message": c.user_message,     
             "bot_id": c.bot_id,
             "user_id": c.user_id
         }
