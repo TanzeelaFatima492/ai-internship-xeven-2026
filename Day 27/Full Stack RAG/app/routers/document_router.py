@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.dependencies import get_db
 from app.models.document import Document
-from app.schemas.document_schema import DocumentResponse
+from app.schemas.document import DocumentResponse
 
 
 router = APIRouter(

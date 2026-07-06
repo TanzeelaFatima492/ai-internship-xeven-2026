@@ -1,32 +1,36 @@
 from app.services.chunk_service import ChunkService
 
-service = ChunkService()
-
 text = """
-Pizza is made with fresh mozzarella cheese.
+Margherita Pizza
 
-Our Margherita Pizza costs Rs.850.
+Price Rs.850
 
-Chicken Burger costs Rs.650.
+Fresh mozzarella cheese
 
-We also have Pasta,
-Garlic Bread,
-French Fries,
-and many desserts.
-""" * 10
+Pepperoni Pizza
+
+Price Rs.1200
+
+Spicy pepperoni
+
+Chicken Burger
+
+Price Rs.650
+
+Crispy chicken
+""" * 30
+
+
+service = ChunkService()
 
 chunks = service.split_text(text)
 
-print("Total Chunks:", len(chunks))
-
-print()
+print("Chunks:", len(chunks))
 
 for i, chunk in enumerate(chunks):
 
     print("=" * 50)
 
-    print(f"Chunk {i + 1}")
+    print(f"Chunk {i+1}")
 
-    print()
-
-    print(chunk)
+    print(chunk[:200])
