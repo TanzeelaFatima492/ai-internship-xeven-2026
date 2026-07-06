@@ -10,6 +10,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+        extra = "allow"  # ✅ Allows GROK_API_KEY and other new env vars
 
 
 settings = Settings()
