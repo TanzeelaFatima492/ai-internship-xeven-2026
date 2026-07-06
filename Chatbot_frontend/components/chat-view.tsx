@@ -36,10 +36,10 @@ export function ChatView({
     user?.id !== undefined ? String(user.id) : "—",
   )
   
-  // ✅ Restore botId from localStorage on load
+  // ✅ User-specific botId from localStorage
   const [botId, setBotId] = useState<number>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("chat_bot_id")
+    if (typeof window !== "undefined" && user?.id) {
+      const saved = localStorage.getItem(`chat_bot_id_${user.id}`)
       return saved ? Number(saved) : 0
     }
     return 0
@@ -64,10 +64,12 @@ export function ChatView({
           setConversations([convo])
           setActiveId(convo.id)
           
-          // ✅ Restore botId from saved value (not 0)
-          const savedBotId = localStorage.getItem("chat_bot_id")
-          if (savedBotId) {
-            setBotId(Number(savedBotId))
+          // ✅ Restore user-specific botId
+          if (user?.id) {
+            const savedBotId = localStorage.getItem(`chat_bot_id_${user.id}`)
+            if (savedBotId) {
+              setBotId(Number(savedBotId))
+            }
           }
         } else {
           startNewChat()
@@ -100,7 +102,8 @@ export function ChatView({
     })
     setActiveId(convo.id)
     setBotId(0)
-    localStorage.removeItem("chat_bot_id")  // ✅ Clear saved botId
+    // ✅ Clear user-specific botId
+    localStorage.removeItem(`chat_bot_id_${userId}`)
     setSidebarOpen(false)
   }
 
@@ -135,10 +138,10 @@ export function ChatView({
       const { response, userId: uid, botId: bid } = await sendMessage(text, botId)
       if (uid) setUserId(String(uid))
       
-      // ✅ Save botId for conversation continuity
+      // ✅ Save user-specific botId
       if (bid && bid !== 0) {
         setBotId(bid)
-        localStorage.setItem("chat_bot_id", String(bid))
+        localStorage.setItem(`chat_bot_id_${uid}`, String(bid))
       }
 
       const botMsg: ChatMessage = {
