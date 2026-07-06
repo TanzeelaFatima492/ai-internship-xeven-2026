@@ -1,9 +1,7 @@
 from app.services.pdf_service import PDFService
 
-service = PDFService()
-
-text = service.extract_text(
-    "data/sample.pdf"
+text = PDFService.extract_text(
+    "data/uploads/sample.pdf"
 )
 
 print(text)

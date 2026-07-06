@@ -5,12 +5,10 @@ from pypdf import PdfReader
 
 class PDFService:
 
-    def extract_text(
-        self,
-        pdf_path: str
-    ) -> str:
+    @staticmethod
+    def extract_text(file_path: str) -> str:
 
-        reader = PdfReader(pdf_path)
+        reader = PdfReader(file_path)
 
         text = ""
 
