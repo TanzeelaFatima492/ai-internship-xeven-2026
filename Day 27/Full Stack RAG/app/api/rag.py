@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from sqlalchemy.orm import Session
+import json
 
 from app.services.faiss_store import faiss_store
 from app.services.embedding_service import embedding_service
@@ -9,6 +10,7 @@ from app.services.llm import llm_service
 from app.database.base import get_db
 from app.models.document import Document
 from app.models.chunk import Chunk
+from app.models.conversation import Conversation
 
 router = APIRouter(prefix="/rag", tags=["RAG Query"])
 
@@ -16,6 +18,7 @@ router = APIRouter(prefix="/rag", tags=["RAG Query"])
 class QueryRequest(BaseModel):
     question: str
     top_k: int = 3
+    conversation_id: Optional[str] = None
 
 class SourceInfo(BaseModel):
     text: str
@@ -27,7 +30,18 @@ class QueryResponse(BaseModel):
     answer: str
     sources: List[SourceInfo]
 
-# ---------- Endpoint ----------
+class ConversationResponse(BaseModel):
+    id: int
+    thread_id: str
+    question: str
+    answer: str
+    sources: Optional[str] = None
+    created_at: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+# ---------- Query Endpoint ----------
 @router.post("/query", response_model=QueryResponse)
 def query_rag(request: QueryRequest, db: Session = Depends(get_db)):
     
@@ -52,11 +66,11 @@ def query_rag(request: QueryRequest, db: Session = Depends(get_db)):
         if chunk:
             doc = db.query(Document).filter(Document.id == chunk.document_id).first()
             sources.append(SourceInfo(
-                text=chunk.content[:200],  # Changed from .text to .content
+                text=chunk.content[:200],
                 document_name=doc.filename if doc else "Unknown",
                 similarity_score=round(1 / (1 + distances[i]), 4) if i < len(distances) else 0
             ))
-            context_chunks.append(chunk.content)  # Changed from .text to .content
+            context_chunks.append(chunk.content)
     
     # 4. Generate answer via LLM
     try:
@@ -64,8 +78,47 @@ def query_rag(request: QueryRequest, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Answer generation failed: {str(e)}")
     
+    # 5. Save conversation to DB
+    conversation = Conversation(
+        thread_id=request.conversation_id or f"thread_{sources[0].document_name}",
+        question=request.question,
+        answer=answer,
+        sources=json.dumps([s.model_dump() for s in sources])
+    )
+    db.add(conversation)
+    db.commit()
+    
     return QueryResponse(
         question=request.question,
         answer=answer,
         sources=sources
     )
+
+# ---------- Thread Endpoints ----------
+@router.get("/threads")
+def list_threads(db: Session = Depends(get_db)):
+    """List all conversation threads"""
+    threads = db.query(Conversation.thread_id).distinct().all()
+    return [{"thread_id": t[0]} for t in threads]
+
+@router.get("/threads/{thread_id}")
+def get_thread(thread_id: str, db: Session = Depends(get_db)):
+    messages = db.query(Conversation).filter(
+        Conversation.thread_id == thread_id
+    ).order_by(Conversation.created_at).all()
+    
+    if not messages:
+        raise HTTPException(status_code=404, detail="Thread not found")
+    
+    result = []
+    for m in messages:
+        result.append({
+            "id": m.id,
+            "thread_id": m.thread_id,
+            "question": m.question,
+            "answer": m.answer,
+            "sources": m.sources,
+            "created_at": str(m.created_at) if m.created_at else None
+        })
+    
+    return result
