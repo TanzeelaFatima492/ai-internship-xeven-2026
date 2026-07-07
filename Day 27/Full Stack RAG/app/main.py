@@ -8,6 +8,7 @@ import app.models
 from app.routers import document_router
 from app.api import rag
 from app.api import analytics
+from app.api import auth
 
 Base.metadata.create_all(bind=engine)
 
@@ -18,6 +19,8 @@ app = FastAPI(
 app.include_router(document_router.router)
 app.include_router(rag.router)
 app.include_router(analytics.router)
+
+app.include_router(auth.router)
 
 @app.get("/")
 def home():

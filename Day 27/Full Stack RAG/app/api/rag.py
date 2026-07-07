@@ -11,6 +11,7 @@ from app.database.base import get_db
 from app.models.document import Document
 from app.models.chunk import Chunk
 from app.models.conversation import Conversation
+from app.auth.auth import get_current_user
 
 router = APIRouter(prefix="/rag", tags=["RAG Query"])
 
@@ -43,7 +44,7 @@ class ConversationResponse(BaseModel):
 
 # ---------- Query Endpoint ----------
 @router.post("/query", response_model=QueryResponse)
-def query_rag(request: QueryRequest, db: Session = Depends(get_db)):
+def query_rag(request: QueryRequest, db: Session = Depends(get_db), user = Depends(get_current_user)):
     
     # 1. Embed the question
     try:
