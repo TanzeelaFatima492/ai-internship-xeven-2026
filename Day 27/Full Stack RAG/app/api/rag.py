@@ -54,7 +54,7 @@ def query_rag(request: QueryRequest, db: Session = Depends(get_db)):
             sources.append(SourceInfo(
                 text=chunk.content[:200],  # Changed from .text to .content
                 document_name=doc.filename if doc else "Unknown",
-                similarity_score=round(1 - min(distances[i], 1), 4) if i < len(distances) else 0
+                similarity_score=round(1 / (1 + distances[i]), 4) if i < len(distances) else 0
             ))
             context_chunks.append(chunk.content)  # Changed from .text to .content
     
