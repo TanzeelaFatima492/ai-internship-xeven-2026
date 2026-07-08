@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text, BigInteger
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
 
@@ -21,8 +21,9 @@ class Conversation(Base):
     __tablename__ = "conversations"
 
     id = Column(Integer, primary_key=True, index=True)
-    bot_id = Column(String, nullable=True) 
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    bot_id = Column(BigInteger, nullable=True)
+    bot_name = Column(String(100), nullable=True)          # ✅ NEW
     user_message = Column(Text)
     bot_response = Column(Text)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

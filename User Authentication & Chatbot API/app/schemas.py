@@ -14,7 +14,6 @@ class UserResponse(BaseModel):
     id: int
     full_name: str
     email: str
-    bot_id: int                    
     created_at: datetime | None = None
 
     class Config:
@@ -25,14 +24,24 @@ class TokenResponse(BaseModel):
     token_type: str
 
 class ConversationCreate(BaseModel):
-    query: str              
-    bot_id: int = 0        
+    query: str
+    bot_id: int = 0
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "query": "hi",
+                "bot_id": 0
+            }
+        }
 
 class ConversationResponse(BaseModel):
-    response: str 
+    response: str
     user_message: str | None = None
     bot_id: int | None = None
+    bot_name: str | None = None            # ✅ NEW
     user_id: int | None = None
-    
+    created_at: datetime | None = None
+
     class Config:
         from_attributes = True

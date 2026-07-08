@@ -246,9 +246,12 @@ function IdPill({ label, value }: { label: string; value: string }) {
   )
 }
 
+
 function deriveTitle(messages: ChatMessage[]): string {
   const first = messages.find((m) => m.role === "user") ?? messages[0]
   if (!first) return "New chat"
+  // ✅ Use bot_name if available
+  if ((first as any).bot_name) return (first as any).bot_name
   return first.content.length > 32
     ? `${first.content.slice(0, 32)}…`
     : first.content
