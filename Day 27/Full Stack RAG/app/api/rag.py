@@ -3,6 +3,8 @@ from pydantic import BaseModel
 from typing import List, Optional
 from sqlalchemy.orm import Session
 import json
+from fastapi.responses import StreamingResponse
+import io
 
 from app.services.faiss_store import faiss_store
 from app.services.embedding_service import embedding_service
@@ -12,7 +14,10 @@ from app.models.document import Document
 from app.models.chunk import Chunk
 from app.models.conversation import Conversation
 from app.auth.auth import get_current_user
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
+limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(prefix="/rag", tags=["RAG Query"])
 
 # ---------- Schemas ----------
@@ -44,6 +49,7 @@ class ConversationResponse(BaseModel):
 
 # ---------- Query Endpoint ----------
 @router.post("/query", response_model=QueryResponse)
+@limiter.limit("5/minute")
 def query_rag(request: QueryRequest, db: Session = Depends(get_db), user = Depends(get_current_user)):
     
     # 1. Embed the question
@@ -123,3 +129,32 @@ def get_thread(thread_id: str, db: Session = Depends(get_db)):
         })
     
     return result
+
+
+@router.get("/export/{thread_id}")
+def export_thread(thread_id: str, db: Session = Depends(get_db)):
+    """Download thread as JSON file"""
+    messages = db.query(Conversation).filter(
+        Conversation.thread_id == thread_id
+    ).order_by(Conversation.created_at).all()
+    
+    if not messages:
+        raise HTTPException(status_code=404, detail="Thread not found")
+    
+    export_data = []
+    for m in messages:
+        export_data.append({
+            "id": m.id,
+            "question": m.question,
+            "answer": m.answer,
+            "sources": json.loads(m.sources) if m.sources else [],
+            "timestamp": str(m.created_at)
+        })
+    
+    json_str = json.dumps(export_data, indent=2)
+    
+    return StreamingResponse(
+        io.BytesIO(json_str.encode()),
+        media_type="application/json",
+        headers={"Content-Disposition": f"attachment; filename=thread_{thread_id}.json"}
+    )
