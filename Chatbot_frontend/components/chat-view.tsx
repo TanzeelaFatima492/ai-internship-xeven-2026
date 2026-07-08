@@ -36,7 +36,6 @@ export function ChatView({
     user?.id !== undefined ? String(user.id) : "—",
   )
   
-  // ✅ User-specific botId from localStorage
   const [botId, setBotId] = useState<number>(() => {
     if (typeof window !== "undefined" && user?.id) {
       const saved = localStorage.getItem(`chat_bot_id_${user.id}`)
@@ -47,6 +46,7 @@ export function ChatView({
 
   const active = conversations.find((c) => c.id === activeId) ?? null
 
+  // ✅ Load history and group by bot_id for multiple conversations
   useEffect(() => {
     let cancelled = false
     async function load() {
@@ -56,38 +56,43 @@ export function ChatView({
         if (cancelled) return
         
         if (history.length > 0) {
-          const convo: Conversation = {
-            id: nextId(),
-            title: deriveTitle(history),
-            messages: history,
-          }
-          setConversations([convo])
-          setActiveId(convo.id)
+          // ✅ Group messages by bot_id
+          const groupedByBot: Record<string, ChatMessage[]> = {}
+          history.forEach((msg: any) => {
+            const bId = msg.bot_id ? String(msg.bot_id) : "default"
+            if (!groupedByBot[bId]) groupedByBot[bId] = []
+            groupedByBot[bId].push(msg)
+          })
           
-          // ✅ Restore user-specific botId
-          if (user?.id) {
-            const savedBotId = localStorage.getItem(`chat_bot_id_${user.id}`)
-            if (savedBotId) {
-              setBotId(Number(savedBotId))
-            }
+          // ✅ Create separate conversations for each bot_id
+          const convos: Conversation[] = Object.entries(groupedByBot).map(([bId, msgs]) => ({
+            id: bId,
+            title: deriveTitle(msgs),
+            messages: msgs.reverse(), // Most recent first
+          }))
+          
+          setConversations(convos)
+          setActiveId(convos[0]?.id || null)
+          
+          // ✅ Restore botId from first conversation
+          const firstBotId = Object.keys(groupedByBot)[0]
+          if (firstBotId && firstBotId !== "default") {
+            setBotId(Number(firstBotId))
+            localStorage.setItem(`chat_bot_id_${user?.id}`, firstBotId)
           }
         } else {
           startNewChat()
         }
       } catch (err) {
         if (cancelled) return
-        setError(
-          err instanceof Error ? err.message : "Failed to load chat history.",
-        )
+        setError(err instanceof Error ? err.message : "Failed to load chat history.")
         startNewChat()
       } finally {
         if (!cancelled) setLoadingHistory(false)
       }
     }
     load()
-    return () => {
-      cancelled = true
-    }
+    return () => { cancelled = true }
   }, [])
 
   function startNewChat() {
@@ -102,7 +107,6 @@ export function ChatView({
     })
     setActiveId(convo.id)
     setBotId(0)
-    // ✅ Clear user-specific botId
     localStorage.removeItem(`chat_bot_id_${userId}`)
     setSidebarOpen(false)
   }
@@ -138,10 +142,11 @@ export function ChatView({
       const { response, userId: uid, botId: bid } = await sendMessage(text, botId)
       if (uid) setUserId(String(uid))
       
-      // ✅ Save user-specific botId
       if (bid && bid !== 0) {
         setBotId(bid)
         localStorage.setItem(`chat_bot_id_${uid}`, String(bid))
+        // ✅ Update conversation ID to bot_id for grouping
+        setActiveId(String(bid))
       }
 
       const botMsg: ChatMessage = {

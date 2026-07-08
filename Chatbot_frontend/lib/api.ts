@@ -173,37 +173,23 @@ export async function getHistory(): Promise<ChatMessage[]> {
 
   const messages: ChatMessage[] = []
   ;(list as Record<string, unknown>[]).forEach((item, i) => {
+    // ✅ Use correct field names from backend
+    const userText = (item.user_message as string) ?? (item.message as string) ?? (item.query as string)
+    const botText = (item.bot_response as string) ?? (item.response as string) ?? (item.reply as string)
 
-    // A history item may be a single message or a {message, response} pair.
-    const userText =
-      (item.message as string) ??
-      (item.prompt as string) ??
-      (item.question as string)
-    const botText =
-      (item.response as string) ??
-      (item.reply as string) ??
-      (item.answer as string)
-
-    if (userText !== undefined || botText !== undefined) {
-      if (userText)
-        messages.push({
-          id: `${i}-u`,
-          role: "user",
-          content: userText,
-          createdAt: item.created_at as string | undefined,
-        })
-      if (botText)
-        messages.push({
-          id: `${i}-b`,
-          role: "bot",
-          content: botText,
-          createdAt: item.created_at as string | undefined,
-        })
-    } else if (item.role && item.content) {
+    if (userText) {
       messages.push({
-        id: (item.id as string) ?? `${i}`,
-        role: item.role === "user" ? "user" : "bot",
-        content: item.content as string,
+        id: `${i}-u`,
+        role: "user",
+        content: userText,
+        createdAt: item.created_at as string | undefined,
+      })
+    }
+    if (botText) {
+      messages.push({
+        id: `${i}-b`,
+        role: "bot",
+        content: botText,
         createdAt: item.created_at as string | undefined,
       })
     }
