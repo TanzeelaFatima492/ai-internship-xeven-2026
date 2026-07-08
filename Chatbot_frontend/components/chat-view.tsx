@@ -132,7 +132,8 @@ export function ChatView({
     setError(null)
     let convoId = activeId
     
-    const isNewConversation = !active || active.messages.length === 0
+    const isNewConversation = botId === 0 || !active || active.messages.length === 0
+    console.log("isNewConversation:", isNewConversation, "active:", active)
     
     if (!convoId || isNewConversation) {
       const convo: Conversation = { id: nextId(), title: text.slice(0, 32), messages: [] }
@@ -165,11 +166,11 @@ export function ChatView({
         localStorage.setItem(`chat_bot_id_${uid}`, String(bid))
       }
 
-      // Set bot name from first message
       if (isNewConversation) {
-        const name = text.length > 30 ? text.slice(0, 27) + "..." : text
-        setBotName(name)
-        localStorage.setItem(`chat_bot_name_${uid}`, name)
+         const name = text.length > 30 ? text.slice(0, 27) + "..." : text
+         setBotName(name)
+         localStorage.setItem(`chat_bot_name_${uid}`, name)
+         console.log("Saved bot name:", name)  // ← CHECK CONSOLE
       }
 
       const botMsg: ChatMessage = {
@@ -236,10 +237,10 @@ export function ChatView({
 
           <div className="flex items-center gap-3">
             <div className="hidden items-center gap-2 text-xs sm:flex">
-              <IdPill label="User" value={user?.full_name || userId} />
-              <IdPill label="Bot" value={botName !== "—" ? botName : String(botId)} />
-            </div>
-            <ThemeToggle />
+             <IdPill label="User" value={user?.full_name || user?.email?.split('@')[0] || userId} />
+             <IdPill label="Bot" value={botName !== "—" ? botName : String(botId)} />
+          </div>
+          <ThemeToggle />
           </div>
         </header>
 
