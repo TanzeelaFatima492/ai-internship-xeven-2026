@@ -46,7 +46,6 @@ export function ChatView({
 
   const active = conversations.find((c) => c.id === activeId) ?? null
 
-  // ✅ Load history and group by bot_id for multiple conversations
   useEffect(() => {
     let cancelled = false
     async function load() {
@@ -56,7 +55,6 @@ export function ChatView({
         if (cancelled) return
         
         if (history.length > 0) {
-          // ✅ Group messages by bot_id
           const groupedByBot: Record<string, ChatMessage[]> = {}
           history.forEach((msg: any) => {
             const bId = msg.bot_id ? String(msg.bot_id) : "default"
@@ -64,17 +62,19 @@ export function ChatView({
             groupedByBot[bId].push(msg)
           })
           
-          // ✅ Create separate conversations for each bot_id
           const convos: Conversation[] = Object.entries(groupedByBot).map(([bId, msgs]) => ({
             id: bId,
             title: deriveTitle(msgs),
-            messages: msgs.reverse(), // Most recent first
+            messages: msgs.reverse(),
           }))
           
           setConversations(convos)
           setActiveId(convos[0]?.id || null)
+
+          console.log("Total convos:", convos.length)
+          console.log("Convo titles:", convos.map(c => c.title))
+          console.log("Convo IDs:", convos.map(c => c.id))
           
-          // ✅ Restore botId from first conversation
           const firstBotId = Object.keys(groupedByBot)[0]
           if (firstBotId && firstBotId !== "default") {
             setBotId(Number(firstBotId))
@@ -118,8 +118,10 @@ export function ChatView({
   async function handleSend(text: string) {
     setError(null)
     let convoId = activeId
-    if (!convoId) {
-      const convo: Conversation = { id: nextId(), title: "New chat", messages: [] }
+    
+    // ✅ New conversation when botId is 0 (fresh start)
+    if (!convoId || botId === 0) {
+      const convo: Conversation = { id: nextId(), title: text.slice(0, 32), messages: [] }
       setConversations((prev) => [convo, ...prev])
       setActiveId(convo.id)
       convoId = convo.id
@@ -133,7 +135,7 @@ export function ChatView({
 
     updateConversation(convoId, (c) => ({
       ...c,
-      title: c.messages.length === 0 ? deriveTitle([userMsg]) : c.title,
+      title: c.messages.length === 0 ? (text.length > 32 ? text.slice(0, 32) + "…" : text) : c.title,
       messages: [...c.messages, userMsg],
     }))
 
@@ -145,8 +147,6 @@ export function ChatView({
       if (bid && bid !== 0) {
         setBotId(bid)
         localStorage.setItem(`chat_bot_id_${uid}`, String(bid))
-        // ✅ Update conversation ID to bot_id for grouping
-        setActiveId(String(bid))
       }
 
       const botMsg: ChatMessage = {
@@ -155,7 +155,7 @@ export function ChatView({
         content: response || "(no response)",
       }
 
-      updateConversation(convoId!, (c) => ({
+      updateConversation(convoId, (c) => ({
         ...c,
         messages: [...c.messages, botMsg],
       }))
@@ -175,6 +175,11 @@ export function ChatView({
         user={user}
         onSelect={(id) => {
           setActiveId(id)
+          const convo = conversations.find(c => c.id === id)
+          if (convo && !convo.id.startsWith("local-")) {
+            setBotId(Number(convo.id))
+            localStorage.setItem(`chat_bot_id_${userId}`, convo.id)
+          }
           setSidebarOpen(false)
         }}
         onNewChat={startNewChat}

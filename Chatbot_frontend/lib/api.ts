@@ -18,6 +18,7 @@ export type ChatMessage = {
   role: "user" | "bot"
   content: string
   createdAt?: string
+  bot_id?: number  // ✅ ADD THIS
 }
 
 export type Conversation = {
@@ -173,9 +174,9 @@ export async function getHistory(): Promise<ChatMessage[]> {
 
   const messages: ChatMessage[] = []
   ;(list as Record<string, unknown>[]).forEach((item, i) => {
-    // ✅ Use correct field names from backend
-    const userText = (item.user_message as string) ?? (item.message as string) ?? (item.query as string)
-    const botText = (item.bot_response as string) ?? (item.response as string) ?? (item.reply as string)
+    const userText = (item.user_message as string) ?? (item.message as string)
+    const botText = (item.bot_response as string) ?? (item.response as string)
+    const botId = (item.bot_id as number) ?? 0 
 
     if (userText) {
       messages.push({
@@ -183,6 +184,7 @@ export async function getHistory(): Promise<ChatMessage[]> {
         role: "user",
         content: userText,
         createdAt: item.created_at as string | undefined,
+        bot_id: botId  // ✅ ADD THIS
       })
     }
     if (botText) {
@@ -191,6 +193,7 @@ export async function getHistory(): Promise<ChatMessage[]> {
         role: "bot",
         content: botText,
         createdAt: item.created_at as string | undefined,
+        bot_id: botId 
       })
     }
   })
