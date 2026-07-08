@@ -44,6 +44,14 @@ export function ChatView({
     return 0
   })
 
+  const [botName, setBotName] = useState<string>(() => {
+    if (typeof window !== "undefined" && user?.id) {
+      const saved = localStorage.getItem(`chat_bot_name_${user.id}`)
+      return saved || "—"
+    }
+    return "—"
+  })
+
   const active = conversations.find((c) => c.id === activeId) ?? null
 
   useEffect(() => {
@@ -70,15 +78,18 @@ export function ChatView({
           
           setConversations(convos)
           setActiveId(convos[0]?.id || null)
-
-          console.log("Total convos:", convos.length)
-          console.log("Convo titles:", convos.map(c => c.title))
-          console.log("Convo IDs:", convos.map(c => c.id))
           
           const firstBotId = Object.keys(groupedByBot)[0]
           if (firstBotId && firstBotId !== "default") {
             setBotId(Number(firstBotId))
             localStorage.setItem(`chat_bot_id_${user?.id}`, firstBotId)
+            
+            // Restore bot name
+            const firstMsg = groupedByBot[firstBotId]?.[0] as any
+            if (firstMsg?.bot_name) {
+              setBotName(firstMsg.bot_name)
+              localStorage.setItem(`chat_bot_name_${user?.id}`, firstMsg.bot_name)
+            }
           }
         } else {
           startNewChat()
@@ -107,7 +118,9 @@ export function ChatView({
     })
     setActiveId(convo.id)
     setBotId(0)
+    setBotName("—")
     localStorage.removeItem(`chat_bot_id_${userId}`)
+    localStorage.removeItem(`chat_bot_name_${userId}`)
     setSidebarOpen(false)
   }
 
@@ -119,8 +132,9 @@ export function ChatView({
     setError(null)
     let convoId = activeId
     
-    // ✅ New conversation when botId is 0 (fresh start)
-    if (!convoId || botId === 0) {
+    const isNewConversation = !active || active.messages.length === 0
+    
+    if (!convoId || isNewConversation) {
       const convo: Conversation = { id: nextId(), title: text.slice(0, 32), messages: [] }
       setConversations((prev) => [convo, ...prev])
       setActiveId(convo.id)
@@ -141,12 +155,21 @@ export function ChatView({
 
     setSending(true)
     try {
-      const { response, userId: uid, botId: bid } = await sendMessage(text, botId)
+      const sendBotId = isNewConversation ? 0 : botId
+      const { response, userId: uid, botId: bid } = await sendMessage(text, sendBotId)
+      
       if (uid) setUserId(String(uid))
       
       if (bid && bid !== 0) {
         setBotId(bid)
         localStorage.setItem(`chat_bot_id_${uid}`, String(bid))
+      }
+
+      // Set bot name from first message
+      if (isNewConversation) {
+        const name = text.length > 30 ? text.slice(0, 27) + "..." : text
+        setBotName(name)
+        localStorage.setItem(`chat_bot_name_${uid}`, name)
       }
 
       const botMsg: ChatMessage = {
@@ -179,6 +202,13 @@ export function ChatView({
           if (convo && !convo.id.startsWith("local-")) {
             setBotId(Number(convo.id))
             localStorage.setItem(`chat_bot_id_${userId}`, convo.id)
+            
+            // Restore bot name
+            const firstMsg = convo.messages[0] as any
+            if (firstMsg?.bot_name) {
+              setBotName(firstMsg.bot_name)
+              localStorage.setItem(`chat_bot_name_${userId}`, firstMsg.bot_name)
+            }
           }
           setSidebarOpen(false)
         }}
@@ -206,8 +236,8 @@ export function ChatView({
 
           <div className="flex items-center gap-3">
             <div className="hidden items-center gap-2 text-xs sm:flex">
-              <IdPill label="User" value={userId} />
-              <IdPill label="Bot" value={String(botId)} />
+              <IdPill label="User" value={user?.full_name || userId} />
+              <IdPill label="Bot" value={botName !== "—" ? botName : String(botId)} />
             </div>
             <ThemeToggle />
           </div>
@@ -246,11 +276,9 @@ function IdPill({ label, value }: { label: string; value: string }) {
   )
 }
 
-
 function deriveTitle(messages: ChatMessage[]): string {
   const first = messages.find((m) => m.role === "user") ?? messages[0]
   if (!first) return "New chat"
-  // ✅ Use bot_name if available
   if ((first as any).bot_name) return (first as any).bot_name
   return first.content.length > 32
     ? `${first.content.slice(0, 32)}…`
