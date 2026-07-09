@@ -1,4 +1,4 @@
-﻿# Path: User Authentication & Chatbot API/app/routers/chat.py
+﻿
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
