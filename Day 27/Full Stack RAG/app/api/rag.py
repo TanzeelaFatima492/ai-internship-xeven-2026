@@ -6,7 +6,7 @@ import json
 from fastapi.responses import StreamingResponse
 import io
 
-from app.services.faiss_store import faiss_store
+from app.services.pinecone_store import pinecone_store
 from app.services.embedding_service import embedding_service
 from app.services.llm import llm_service
 from app.database.base import get_db
@@ -14,10 +14,6 @@ from app.models.document import Document
 from app.models.chunk import Chunk
 from app.models.conversation import Conversation
 from app.auth.auth import get_current_user
-from slowapi import Limiter
-from slowapi.util import get_remote_address
-
-limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(prefix="/rag", tags=["RAG Query"])
 
 # ---------- Schemas ----------
@@ -49,7 +45,6 @@ class ConversationResponse(BaseModel):
 
 # ---------- Query Endpoint ----------
 @router.post("/query", response_model=QueryResponse)
-@limiter.limit("5/minute")
 def query_rag(request: QueryRequest, db: Session = Depends(get_db), user = Depends(get_current_user)):
     
     # 1. Embed the question
@@ -59,7 +54,7 @@ def query_rag(request: QueryRequest, db: Session = Depends(get_db), user = Depen
         raise HTTPException(status_code=500, detail=f"Embedding failed: {str(e)}")
     
     # 2. Search FAISS
-    distances, chunk_ids = faiss_store.search(question_embedding, request.top_k)
+    distances, chunk_ids = pinecone_store.search(question_embedding, request.top_k)
     
     if not chunk_ids:
         raise HTTPException(status_code=404, detail="No matching documents found. Upload a menu first.")

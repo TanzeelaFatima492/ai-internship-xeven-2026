@@ -10,7 +10,7 @@ from app.schemas.document import DocumentResponse
 from app.services.pdf_service import PDFService
 from app.services.chunk_service import ChunkService
 from app.services.embedding_service import embedding_service
-from app.services.faiss_store import faiss_store
+from app.services.pinecone_store import pinecone_store
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
@@ -63,6 +63,6 @@ async def upload_document(
         chunk_ids.append(chunk.id)
 
     # 7. Store in FAISS
-    faiss_store.add_embeddings(embeddings, chunk_ids)
+    pinecone_store.add_embeddings(embeddings, chunk_ids)
 
     return document

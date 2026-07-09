@@ -10,23 +10,21 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Restaurant RAG API")
 
-# Simple rate limiter
-rate_limit_store = defaultdict(list)
+# Rate limiter
+rate_store = defaultdict(list)
 
 @app.middleware("http")
-async def rate_limit_middleware(request: Request, call_next):
-    client_ip = request.client.host
+async def rate_limit(request: Request, call_next):
+    ip = request.client.host
     now = time.time()
+    rate_store[ip] = [t for t in rate_store[ip] if now - t < 60]
     
-    # Clean old entries
-    rate_limit_store[client_ip] = [t for t in rate_limit_store[client_ip] if now - t < 60]
+    if len(rate_store[ip]) >= 10:
+        return HTTPException(status_code=429, detail="Rate limit exceeded")
     
-    # Check limit: 10 requests per minute
-    if len(rate_limit_store[client_ip]) >= 10:
-        raise HTTPException(status_code=429, detail="Too many requests. Try again later.")
-    
-    rate_limit_store[client_ip].append(now)
-    return await call_next(request)
+    rate_store[ip].append(now)
+    response = await call_next(request)
+    return response
 
 app.include_router(document_router.router)
 app.include_router(rag.router)
