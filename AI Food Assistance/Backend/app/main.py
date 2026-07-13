@@ -5,7 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.database.database import Base, engine
 from app.routers import document_router
-from app.api import rag, analytics, auth
+from app.api import rag, analytics, auth, document
+
+from fastapi.responses import JSONResponse
 
 Base.metadata.create_all(bind=engine)
 
@@ -28,10 +30,10 @@ async def rate_limit(request: Request, call_next):
     ip = request.client.host
     now = time.time()
     rate_store[ip] = [t for t in rate_store[ip] if now - t < 60]
-    
-    if len(rate_store[ip]) >= 10:
-        return HTTPException(status_code=429, detail="Rate limit exceeded")
-    
+   
+    if len(rate_store[ip]) >= 100:
+        return JSONResponse(status_code=429, content={"detail": "Rate limit exceeded. Try again later."})
+     
     rate_store[ip].append(now)
     response = await call_next(request)
     return response
@@ -40,6 +42,7 @@ app.include_router(document_router.router)
 app.include_router(rag.router)
 app.include_router(analytics.router)
 app.include_router(auth.router)
+app.include_router(document.router)
 
 @app.get("/")
 def home():

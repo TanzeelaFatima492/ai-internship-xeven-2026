@@ -14,14 +14,14 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Username exists")
     
     new_user = User(
-        username=user.username,
-        email=user.email,
-        hashed_password=hash_password(user.password),
-        role=user.role
-    )
+    username=user.username,
+    email=user.email,
+    hashed_password=hash_password(user.password),
+    role="customer"  # Always customer
+)
     db.add(new_user)
     db.commit()
-    return {"message": "User created", "role": user.role}
+    return {"message": "User created"}
 
 @router.post("/login")
 def login(user: UserLogin, db: Session = Depends(get_db)):
