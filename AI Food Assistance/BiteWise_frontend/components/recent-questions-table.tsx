@@ -1,105 +1,57 @@
 'use client'
 
-import { formatDistanceToNow } from 'date-fns'
+import { useEffect, useState } from 'react'
 
 interface Question {
-  id: string
+  id: number
   question: string
-  user: string
-  timestamp: Date
-  category: string
-}
-
-const sampleQuestions: Question[] = [
-  {
-    id: '1',
-    question: "What's the price of butter chicken?",
-    user: 'Ahmed Khan',
-    timestamp: new Date(Date.now() - 5 * 60000),
-    category: 'Menu',
-  },
-  {
-    id: '2',
-    question: 'Do you have any vegan options?',
-    user: 'Sarah Ali',
-    timestamp: new Date(Date.now() - 15 * 60000),
-    category: 'Dietary',
-  },
-  {
-    id: '3',
-    question: 'What are your delivery hours?',
-    user: 'Hassan Shah',
-    timestamp: new Date(Date.now() - 32 * 60000),
-    category: 'Policies',
-  },
-  {
-    id: '4',
-    question: 'Tell me about your biryani varieties',
-    user: 'Fatima Hassan',
-    timestamp: new Date(Date.now() - 1 * 3600000),
-    category: 'Menu',
-  },
-  {
-    id: '5',
-    question: 'What are the current offers?',
-    user: 'Muhammad Ali',
-    timestamp: new Date(Date.now() - 2 * 3600000),
-    category: 'Offers',
-  },
-]
-
-const getCategoryColor = (category: string) => {
-  const colors: Record<string, string> = {
-    Menu: 'bg-primary/10 text-primary',
-    Dietary: 'bg-accent/10 text-accent',
-    Policies: 'bg-secondary/10 text-secondary',
-    Offers: 'bg-green-500/10 text-green-500',
-  }
-  return colors[category] || 'bg-muted text-muted-foreground'
+  answer: string
+  created_at: string
 }
 
 export default function RecentQuestionsTable() {
-  return (
-    <div className="bg-card border border-border rounded-xl overflow-hidden">
-      <div className="p-6 border-b border-border">
-        <h3 className="text-lg font-semibold text-foreground">Recent Questions</h3>
-        <p className="text-sm text-muted-foreground">Latest user queries from the past 24 hours</p>
-      </div>
+  const [questions, setQuestions] = useState<Question[]>([])
 
+  useEffect(() => {
+    const token = localStorage.getItem('bitewise_auth_token')
+    fetch('http://localhost:8000/analytics/recent-queries?limit=5', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(r => r.json())
+    .then(data => setQuestions(data))
+    .catch(console.error)
+  }, [])
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="p-6 border-b border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-900">Recent Questions</h3>
+      </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-muted/50 border-b border-border">
+          <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th className="px-6 py-3 text-left font-semibold text-muted-foreground">Question</th>
-              <th className="px-6 py-3 text-left font-semibold text-muted-foreground">User</th>
-              <th className="px-6 py-3 text-left font-semibold text-muted-foreground">Category</th>
-              <th className="px-6 py-3 text-left font-semibold text-muted-foreground">Time</th>
+              <th className="px-6 py-3 text-left font-semibold text-gray-600">Question</th>
+              <th className="px-6 py-3 text-left font-semibold text-gray-600">Answer</th>
+              <th className="px-6 py-3 text-left font-semibold text-gray-600">Time</th>
             </tr>
           </thead>
           <tbody>
-            {sampleQuestions.map((question) => (
-              <tr
-                key={question.id}
-                className="border-b border-border hover:bg-muted/30 transition-colors"
-              >
-                <td className="px-6 py-4 text-foreground max-w-xs truncate">
-                  {question.question}
-                </td>
-                <td className="px-6 py-4 text-muted-foreground">{question.user}</td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(
-                      question.category
-                    )}`}
-                  >
-                    {question.category}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-muted-foreground">
-                  {formatDistanceToNow(question.timestamp, { addSuffix: true })}
-                </td>
+            {questions.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="px-6 py-8 text-center text-gray-400">No queries yet</td>
               </tr>
-            ))}
+            ) : (
+              questions.map((q) => (
+                <tr key={q.id} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="px-6 py-4 text-gray-900 max-w-xs truncate">{q.question}</td>
+                  <td className="px-6 py-4 text-gray-500 max-w-xs truncate">{q.answer?.substring(0, 60)}...</td>
+                  <td className="px-6 py-4 text-gray-400 whitespace-nowrap">
+                    {new Date(q.created_at).toLocaleString()}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

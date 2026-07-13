@@ -1,16 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-react'
 
-interface LoginFormProps {
-  loading: boolean
-  setLoading: (loading: boolean) => void
-}
-
-export default function LoginForm({ loading, setLoading }: LoginFormProps) {
-  const router = useRouter()
+export default function LoginForm() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -25,28 +18,29 @@ export default function LoginForm({ loading, setLoading }: LoginFormProps) {
     try {
       const response = await fetch('http://localhost:8000/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.error || 'Invalid credentials')
+        setError(data.detail || 'Invalid credentials')
         return
       }
 
-      // Store JWT token
+      // Store token and role
       localStorage.setItem('bitewise_auth_token', data.access_token)
       localStorage.setItem('user_role', data.role)
 
-      // Redirect to home
-      router.push('/home')
+      // Force redirect based on role
+      if (data.role === 'admin') {
+        window.location.href = '/admin'
+      } else {
+        window.location.href = '/home'
+      }
     } catch (err) {
       setError('Something went wrong. Please try again.')
-      console.error(err)
     } finally {
       setIsSubmitting(false)
     }
@@ -54,75 +48,52 @@ export default function LoginForm({ loading, setLoading }: LoginFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Username Field */}
       <div className="space-y-2">
-        <label htmlFor="username" className="block text-sm font-medium text-foreground">
-          Username
-        </label>
+        <label className="block text-sm font-medium">Username</label>
         <input
-          id="username"
           type="text"
           placeholder="Enter your username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+          className="w-full px-4 py-3 bg-background border border-border rounded-lg"
           disabled={isSubmitting}
         />
       </div>
 
-      {/* Password Field */}
       <div className="space-y-2">
-        <label htmlFor="password" className="block text-sm font-medium text-foreground">
-          Password
-        </label>
+        <label className="block text-sm font-medium">Password</label>
         <div className="relative">
           <input
-            id="password"
             type={showPassword ? 'text' : 'password'}
             placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 pr-10"
+            className="w-full px-4 py-3 bg-background border border-border rounded-lg pr-10"
             disabled={isSubmitting}
           />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-            tabIndex={-1}
-          >
+          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2">
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
       </div>
 
-      {/* Error Message */}
       {error && (
-        <div className="flex items-center gap-3 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-          <AlertCircle size={18} className="text-destructive flex-shrink-0" />
-          <p className="text-sm text-destructive">{error}</p>
+        <div className="flex items-center gap-3 p-3 bg-red-100 border border-red-200 rounded-lg">
+          <AlertCircle size={18} className="text-red-500" />
+          <p className="text-sm text-red-600">{error}</p>
         </div>
       )}
 
-      {/* Submit Button */}
       <button
         type="submit"
         disabled={isSubmitting || !username.trim() || !password.trim()}
-        className="w-full py-3 px-4 bg-gradient-to-r from-primary via-accent to-secondary text-primary-foreground font-semibold rounded-lg transition-all duration-200 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+        className="w-full py-3 px-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-lg disabled:opacity-50"
       >
-        {isSubmitting ? (
-          <>
-            <Loader2 size={18} className="animate-spin" />
-            Signing in...
-          </>
-        ) : (
-          'Login'
-        )}
+        {isSubmitting ? <Loader2 size={18} className="animate-spin inline" /> : 'Login'}
       </button>
 
-      {/* Help text */}
-      <p className="text-xs text-center text-muted-foreground mt-4">
-        Demo credentials: admin / password123
+      <p className="text-xs text-center text-gray-500 mt-4">
+        Admin: admin / admin123 | Customer: Sign up first
       </p>
     </form>
   )

@@ -1,235 +1,121 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { Upload, File, X, CheckCircle, AlertCircle } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { Upload, File, Trash2, Eye } from 'lucide-react'
 
-interface UploadedFile {
-  id: string
-  name: string
-  size: number
-  status: 'uploading' | 'success' | 'error'
-  progress: number
+interface Doc {
+  id: number
+  filename: string
+  file_type: string
+  uploaded_at: string
 }
 
-interface PDFUploadAreaProps {
-  onUploadComplete: () => void
-}
-
-export default function PDFUploadArea({ onUploadComplete }: PDFUploadAreaProps) {
+export default function PDFUploadArea({ onUploadComplete }: { onUploadComplete: () => void }) {
   const [isDragging, setIsDragging] = useState(false)
-  const [files, setFiles] = useState<UploadedFile[]>([])
+  const [uploading, setUploading] = useState(false)
+  const [documents, setDocuments] = useState<Doc[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleDragEnter = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(true)
-  }
+  useEffect(() => { fetchDocs() }, [])
 
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(false)
-  }
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-  }
-
-  const processFiles = (fileList: FileList | null) => {
-    if (!fileList) return
-
-    Array.from(fileList).forEach((file) => {
-      if (file.type === 'application/pdf') {
-        const newFile: UploadedFile = {
-          id: `${Date.now()}-${Math.random()}`,
-          name: file.name,
-          size: file.size,
-          status: 'uploading',
-          progress: 0,
-        }
-        setFiles((prev) => [...prev, newFile])
-
-        // Simulate upload progress
-        const progressInterval = setInterval(() => {
-          setFiles((prev) =>
-            prev.map((f) =>
-              f.id === newFile.id
-                ? {
-                    ...f,
-                    progress: Math.min(f.progress + Math.random() * 40, 90),
-                  }
-                : f
-            )
-          )
-        }, 300)
-
-        // Simulate upload completion
-        setTimeout(() => {
-          clearInterval(progressInterval)
-          setFiles((prev) =>
-            prev.map((f) =>
-              f.id === newFile.id
-                ? { ...f, progress: 100, status: 'success' }
-                : f
-            )
-          )
-          onUploadComplete()
-        }, 2000)
+  const fetchDocs = async () => {
+    const token = localStorage.getItem('bitewise_auth_token')
+    try {
+      const res = await fetch('http://localhost:8000/rag/admin/', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setDocuments(Array.isArray(data) ? data : [])
       }
+    } catch (err) { console.error('Fetch docs failed:', err) }
+  }
+
+  const uploadFile = async (file: File) => {
+    const token = localStorage.getItem('bitewise_auth_token')
+    setUploading(true)
+    const formData = new FormData()
+    formData.append('file', file)
+    try {
+      const res = await fetch('http://localhost:8000/rag/admin/upload', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      })
+      if (res.ok) { onUploadComplete(); fetchDocs() }
+    } catch (err) { console.error('Upload failed:', err) }
+    finally { setUploading(false) }
+  }
+
+  const deleteDoc = async (id: number) => {
+    const token = localStorage.getItem('bitewise_auth_token')
+    await fetch(`http://localhost:8000/rag/admin/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
     })
+    fetchDocs()
+  }
+
+  const viewPDF = (filename: string) => {
+    window.open(`http://localhost:8000/rag/admin/view/${filename}`, '_blank')
   }
 
   const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(false)
-    processFiles(e.dataTransfer.files)
-  }
-
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    processFiles(e.target.files)
-  }
-
-  const handleRemoveFile = (id: string) => {
-    setFiles((prev) => prev.filter((f) => f.id !== id))
-  }
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes'
-    const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i]
+    e.preventDefault(); setIsDragging(false)
+    const file = e.dataTransfer.files[0]
+    if (file?.type === 'application/pdf') uploadFile(file)
   }
 
   return (
     <div className="space-y-6">
       {/* Upload Area */}
       <div
-        onDragEnter={handleDragEnter}
-        onDragLeave={handleDragLeave}
-        onDragOver={handleDragOver}
+        onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
+        onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
-        className={`relative border-2 border-dashed rounded-xl p-12 transition-all duration-200 cursor-pointer ${
-          isDragging
-            ? 'border-primary bg-primary/5'
-            : 'border-border bg-muted/20 hover:border-primary/50'
+        className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-all ${
+          isDragging ? 'border-orange-500 bg-orange-50' : 'border-gray-300 hover:border-orange-300'
         }`}
       >
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept=".pdf"
-          onChange={handleFileInputChange}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        />
-
-        <div className="text-center">
-          <div className="bg-gradient-to-br from-primary/20 to-accent/20 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Upload className="w-8 h-8 text-primary" />
-          </div>
-          <h3 className="text-lg font-semibold text-foreground mb-2">
-            Drag & drop your PDF files here
+        <input ref={fileInputRef} type="file" accept=".pdf" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadFile(f) }} className="hidden" />
+        <div onClick={() => fileInputRef.current?.click()}>
+          <Upload className="w-12 h-12 text-orange-500 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            {uploading ? 'Uploading...' : 'Drag & drop PDF or click to browse'}
           </h3>
-          <p className="text-muted-foreground mb-4">
-            or click to browse your computer
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Supports PDF files up to 50MB each
-          </p>
+          <p className="text-sm text-gray-500">PDF files only</p>
         </div>
       </div>
 
-      {/* Uploaded Files List */}
-      {files.length > 0 && (
-        <div className="bg-card border border-border rounded-xl overflow-hidden">
-          <div className="p-6 border-b border-border">
-            <h3 className="text-lg font-semibold text-foreground">
-              Uploaded Files ({files.length})
-            </h3>
+      {/* Document List */}
+      {documents.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="p-4 border-b border-gray-200 bg-gray-50">
+            <h3 className="font-semibold text-gray-900">Uploaded Documents ({documents.length})</h3>
           </div>
-
-          <div className="divide-y divide-border">
-            {files.map((file) => (
-              <div key={file.id} className="p-6 hover:bg-muted/20 transition-colors">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-start gap-4 flex-1">
-                    <div className="bg-primary/10 rounded-lg p-3 mt-1">
-                      <File className="w-5 h-5 text-primary" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground truncate">{file.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {formatFileSize(file.size)}
-                      </p>
-                    </div>
+          <div className="divide-y divide-gray-200">
+            {documents.map((doc) => (
+              <div key={doc.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                <div className="flex items-center gap-3">
+                  <File className="w-8 h-8 text-orange-500" />
+                  <div>
+                    <p className="font-medium text-gray-900">{doc.filename}</p>
+                    <p className="text-xs text-gray-500">{new Date(doc.uploaded_at).toLocaleDateString()}</p>
                   </div>
-
-                  <button
-                    onClick={() => handleRemoveFile(file.id)}
-                    className="p-2 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground"
-                  >
-                    <X size={20} />
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={() => viewPDF(doc.filename)} className="p-2 hover:bg-gray-100 text-orange-500 rounded-lg" title="View PDF">
+                    <Eye size={18} />
+                  </button>
+                  <button onClick={() => deleteDoc(doc.id)} className="p-2 hover:bg-red-50 text-red-500 rounded-lg" title="Delete">
+                    <Trash2 size={18} />
                   </button>
                 </div>
-
-                {/* Progress Bar */}
-                {file.status === 'uploading' && (
-                  <div className="space-y-2">
-                    <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300"
-                        style={{ width: `${file.progress}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground text-right">
-                      {Math.round(file.progress)}%
-                    </p>
-                  </div>
-                )}
-
-                {/* Status */}
-                {file.status === 'success' && (
-                  <div className="flex items-center gap-2 text-sm text-green-500">
-                    <CheckCircle size={16} />
-                    Upload completed successfully
-                  </div>
-                )}
-
-                {file.status === 'error' && (
-                  <div className="flex items-center gap-2 text-sm text-destructive">
-                    <AlertCircle size={16} />
-                    Upload failed. Please try again.
-                  </div>
-                )}
               </div>
             ))}
           </div>
         </div>
       )}
-
-      {/* Upload Info */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20 rounded-xl p-4">
-          <h4 className="font-semibold text-foreground mb-2">Supported Formats</h4>
-          <ul className="text-sm text-muted-foreground space-y-1">
-            <li>• PDF documents</li>
-            <li>• Menu files</li>
-            <li>• Policy documents</li>
-          </ul>
-        </div>
-        <div className="bg-gradient-to-br from-secondary/5 to-accent/5 border border-secondary/20 rounded-xl p-4">
-          <h4 className="font-semibold text-foreground mb-2">Best Practices</h4>
-          <ul className="text-sm text-muted-foreground space-y-1">
-            <li>• Clear, readable PDF scans</li>
-            <li>• Organize by category</li>
-            <li>• Update regularly</li>
-          </ul>
-        </div>
-      </div>
     </div>
   )
 }
