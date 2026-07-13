@@ -1,8 +1,7 @@
-﻿
-
-from fastapi import APIRouter, Depends
+﻿from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from typing import List
+from datetime import datetime, timedelta
 from app.database import SessionLocal
 from app.models import Conversation, User
 from app.schemas import ConversationCreate, ConversationResponse
@@ -12,6 +11,8 @@ import random
 
 router = APIRouter(prefix="/chat", tags=["Chatbot"])
 
+DAILY_LIMIT = 30  # ✅ 30 messages per day
+
 def get_db():
     db = SessionLocal()
     try:
@@ -19,12 +20,31 @@ def get_db():
     finally:
         db.close()
 
+def check_rate_limit(user_id: int, db: Session):
+    """Check if user has exceeded daily message limit"""
+    today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    count = db.query(Conversation).filter(
+        Conversation.user_id == user_id,
+        Conversation.created_at >= today_start
+    ).count()
+    
+    if count >= DAILY_LIMIT:
+        raise HTTPException(
+            status_code=429,
+            detail=f"Daily limit reached: {DAILY_LIMIT} messages per day. Please try again tomorrow."
+        )
+    return count
+
 @router.post("/", response_model=ConversationResponse)
 def chat(
     data: ConversationCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    # ✅ Rate limit check
+    check_rate_limit(current_user.id, db)
+    
     user_msg = data.query
     bot_id = data.bot_id
 
@@ -37,7 +57,6 @@ def chat(
         bot_name = None
         reply = get_ai_response(user_msg)
         
-        # Get existing bot_name
         existing = db.query(Conversation).filter(
             Conversation.bot_id == bot_id
         ).first()
@@ -55,11 +74,18 @@ def chat(
     db.add(conversation)
     db.commit()
 
+    # ✅ Remaining messages count
+    remaining = DAILY_LIMIT - db.query(Conversation).filter(
+        Conversation.user_id == current_user.id,
+        Conversation.created_at >= datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    ).count()
+
     return {
         "response": reply,
         "bot_id": new_bot_id,
         "bot_name": bot_name,
-        "user_id": current_user.id
+        "user_id": current_user.id,
+        "remaining_messages": remaining  # ✅ Kitne messages bache
     }
 
 @router.get("/history", response_model=List[ConversationResponse])

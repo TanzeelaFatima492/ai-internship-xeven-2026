@@ -85,7 +85,8 @@ def query_rag(request: QueryRequest, db: Session = Depends(get_db), user = Depen
         thread_id=request.conversation_id or f"thread_{sources[0].document_name}",
         question=request.question,
         answer=answer,
-        sources=json.dumps([s.model_dump() for s in sources])
+        sources=json.dumps([s.model_dump() for s in sources]),
+        user_id=user.id
     )
     db.add(conversation)
     db.commit()
@@ -153,3 +154,11 @@ def export_thread(thread_id: str, db: Session = Depends(get_db)):
         media_type="application/json",
         headers={"Content-Disposition": f"attachment; filename=thread_{thread_id}.json"}
     )
+
+
+@router.get("/threads")
+def list_threads(db: Session = Depends(get_db), user = Depends(get_current_user)):
+    threads = db.query(Conversation.thread_id).filter(
+        Conversation.user_id == user.id
+    ).distinct().all()
+    return [{"thread_id": t[0]} for t in threads]

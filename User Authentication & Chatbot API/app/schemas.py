@@ -39,9 +39,10 @@ class ConversationResponse(BaseModel):
     response: str
     user_message: str | None = None
     bot_id: int | None = None
-    bot_name: str | None = None            # ✅ NEW
+    bot_name: str | None = None
     user_id: int | None = None
     created_at: datetime | None = None
+    remaining_messages: int | None = None  # ✅ NEW
 
     class Config:
         from_attributes = True
