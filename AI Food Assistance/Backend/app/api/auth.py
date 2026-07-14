@@ -9,19 +9,27 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 @router.post("/signup")
 def signup(user: UserCreate, db: Session = Depends(get_db)):
-    existing = db.query(User).filter(User.username == user.username).first()
-    if existing:
-        raise HTTPException(status_code=400, detail="Username exists")
+    # Check existing username
+    existing_user = db.query(User).filter(User.username == user.username).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username already exists")
+    
+    # Check existing email
+    existing_email = db.query(User).filter(User.email == user.email).first()
+    if existing_email:
+        raise HTTPException(status_code=400, detail="Email already registered")
     
     new_user = User(
-    username=user.username,
-    email=user.email,
-    hashed_password=hash_password(user.password),
-    role="customer"  # Always customer
-)
+        username=user.username,
+        email=user.email,
+        hashed_password=hash_password(user.password),
+        role="customer"
+    )
     db.add(new_user)
     db.commit()
-    return {"message": "User created"}
+    db.refresh(new_user)
+    
+    return {"message": "User created successfully"}
 
 @router.post("/login")
 def login(user: UserLogin, db: Session = Depends(get_db)):
