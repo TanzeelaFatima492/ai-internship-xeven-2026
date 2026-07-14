@@ -80,10 +80,16 @@ def query_rag(request: QueryRequest, db: Session = Depends(get_db), user = Depen
 # ---------- Thread Endpoints ----------
 @router.get("/threads")
 def list_threads(db: Session = Depends(get_db), user = Depends(get_current_user)):
-    threads = db.query(Conversation.thread_id).filter(
+    threads = db.query(Conversation.thread_id, Conversation.question).filter(
         Conversation.user_id == user.id
-    ).distinct().all()
-    return [{"thread_id": t[0]} for t in threads]
+    ).order_by(Conversation.created_at.desc()).all()
+    result = []
+    seen = set()
+    for t in threads:
+        if t[0] not in seen:
+            seen.add(t[0])
+            result.append({"thread_id": t[0], "title": t[1][:40] if t[1] else t[0]})
+    return result
 
 @router.get("/threads/{thread_id}")
 def get_thread(thread_id: str, db: Session = Depends(get_db), user = Depends(get_current_user)):
