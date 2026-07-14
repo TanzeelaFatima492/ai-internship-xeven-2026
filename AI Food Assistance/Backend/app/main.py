@@ -31,7 +31,7 @@ async def rate_limit(request: Request, call_next):
     now = time.time()
     rate_store[ip] = [t for t in rate_store[ip] if now - t < 60]
    
-    if len(rate_store[ip]) >= 100:
+    if len(rate_store[ip]) >= 30:
         return JSONResponse(status_code=429, content={"detail": "Rate limit exceeded. Try again later."})
      
     rate_store[ip].append(now)
