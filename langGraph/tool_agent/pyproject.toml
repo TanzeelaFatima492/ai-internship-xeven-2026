@@ -1,0 +1,43 @@
+[project]
+name = "agent-tool-project"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aiohttp>=3.13.3",
+    "async-timeout>=5.0.1",
+    "asyncpg>=0.31.0",
+    "bcrypt==3.2.2",
+    "certifi==2025.1.31",
+    "click==8.1.8",
+    "ddgs>=9.14.1",
+    "fastapi>=0.129.0",
+    "grpcio>=1.78.0",
+    "langchain>=1.2.10",
+    "langchain-community>=0.4.1",
+    "langchain-core>=1.2.13",
+    "langchain-google-genai>=4.2.0",
+    "langchain-google-vertexai>=3.2.2",
+    "langchain-openai>=1.1.10",
+    "langchain-pinecone>=0.2.13",
+    "langgraph>=1.0.8",
+    "langgraph-checkpoint>=4.0.0",
+    "langgraph-checkpoint-postgres>=3.0.4",
+    "nest-asyncio>=1.6.0",
+    "orjson==3.10.16",
+    "passlib==1.7.4",
+    "pinecone>=7.3.0",
+    "pinecone-client>=6.0.0",
+    "psycopg-binary>=3.3.3",
+    "psycopg[binary,pool]>=3.3.3",
+    "pydantic-settings>=2.13.0",
+    "pydantic[email]>=2.12.5",
+    "pymupdf>=1.27.1",
+    "python-dotenv>=1.2.1",
+    "python-jose[cryptography]>=3.5.0",
+    "python-multipart>=0.0.22",
+    "simsimd>=6.5.13",
+    "sqlalchemy==2.0.39",
+    "uvicorn>=0.41.0",
+]
