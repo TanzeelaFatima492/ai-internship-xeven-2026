@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Integer, Float, DateTime, JSON, Boolean
+﻿from sqlalchemy import Column, String, Integer, Float, DateTime, JSON, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 import uuid
@@ -10,42 +11,44 @@ def generate_uuid():
 
 class User(Base):
     __tablename__ = "users"
-    
     id = Column(String, primary_key=True, default=generate_uuid)
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     phone = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    orders = relationship("Order", back_populates="user")
+    offers = relationship("Offer", back_populates="user")
+    notifications = relationship("Notification", back_populates="user")
 
 class Order(Base):
     __tablename__ = "orders"
-    
     id = Column(String, primary_key=True, default=generate_uuid)
-    user_id = Column(String, nullable=False)
-    items = Column(JSON, nullable=False)  # [{"name": "Burger", "price": 10.99, "category": "fast_food"}]
+    user_id = Column(String, ForeignKey("users.id"), nullable=False)
+    items = Column(JSON, nullable=False)
     total = Column(Float, nullable=False)
-    status = Column(String, default="pending")  # pending, completed, cancelled
+    status = Column(String, default="pending")
     timestamp = Column(DateTime, default=datetime.utcnow)
+    user = relationship("User", back_populates="orders")
 
 class Offer(Base):
     __tablename__ = "offers"
-    
     id = Column(String, primary_key=True, default=generate_uuid)
-    user_id = Column(String, nullable=False)
-    type = Column(String, nullable=False)  # routine_reminder, streak_protection, re_engagement, combo_deal, milestone_reward
+    user_id = Column(String, ForeignKey("users.id"), nullable=False)
+    type = Column(String, nullable=False)
     message = Column(String, nullable=False)
-    discount = Column(String, nullable=True)  # "10% off", "Free dessert"
+    discount = Column(String, nullable=True)
     sent_at = Column(DateTime, default=datetime.utcnow)
     is_claimed = Column(Boolean, default=False)
     expires_at = Column(DateTime, nullable=True)
+    user = relationship("User", back_populates="offers")
 
 class Notification(Base):
     __tablename__ = "notifications"
-    
     id = Column(String, primary_key=True, default=generate_uuid)
-    user_id = Column(String, nullable=False)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False)
     message = Column(String, nullable=False)
     read = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
-    type = Column(String, default="info")  # info, offer, reminder, alert
+    type = Column(String, default="info")
+    user = relationship("User", back_populates="notifications")

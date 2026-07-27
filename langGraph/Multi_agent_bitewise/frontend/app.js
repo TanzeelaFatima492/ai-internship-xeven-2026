@@ -253,3 +253,51 @@ window.onload = function() {
         getNotifications();
     }, 30000);
 };
+
+
+// ==================== CONFIGURATION ====================
+const API_BASE = "http://localhost";
+const SERVICES = {
+    patterns: `${API_BASE}:8001`,
+    offers: `${API_BASE}:8002`,
+    notifications: `${API_BASE}:8003`,
+};
+
+let currentUser = "user-001";
+
+// ==================== USER FUNCTIONS ====================
+
+async function createUser() {
+    const name = document.getElementById("userName").value;
+    const email = document.getElementById("userEmail").value;
+    const phone = document.getElementById("userPhone").value;
+    
+    if (!name || !email) {
+        showToast("❌ Name and email are required");
+        return;
+    }
+    
+    try {
+        const response = await fetch(
+            `${SERVICES.patterns}/user?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone || '')}`,
+            { method: "POST" }
+        );
+        const data = await response.json();
+        if (response.ok) {
+            showToast(`✅ User created: ${data.user_id}`);
+            document.getElementById("userId").value = data.user_id;
+            currentUser = data.user_id;
+            analyzeUser();
+        } else {
+            showToast(`❌ ${data.detail}`);
+        }
+    } catch (error) {
+        showToast(`❌ Error: ${error.message}`);
+    }
+}
+
+function getUserId() {
+    return document.getElementById("userId").value.trim() || "user-001";
+}
+
+// Update HTML to include user creation
