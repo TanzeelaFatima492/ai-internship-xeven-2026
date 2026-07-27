@@ -11,16 +11,19 @@ def generate_uuid():
 
 class User(Base):
     __tablename__ = "users"
+    
     id = Column(String, primary_key=True, default=generate_uuid)
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     phone = Column(String, nullable=True)
+    password_hash = Column(String, nullable=False)  # 👈 Add this
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
     orders = relationship("Order", back_populates="user")
     offers = relationship("Offer", back_populates="user")
     notifications = relationship("Notification", back_populates="user")
-
+    
 class Order(Base):
     __tablename__ = "orders"
     id = Column(String, primary_key=True, default=generate_uuid)
