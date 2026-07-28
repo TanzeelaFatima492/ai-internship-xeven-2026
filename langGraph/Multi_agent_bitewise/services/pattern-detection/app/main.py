@@ -6,18 +6,18 @@ ROOT_PATH = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fi
 if ROOT_PATH not in sys.path:
     sys.path.insert(0, ROOT_PATH)
 
-# ==================== IMPORTS ====================
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import List, Dict, Optional
 import uvicorn
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
-# Shared database
 from shared.database.models import User, Order
 from shared.database.database import get_db, engine, Base
+from auth_agent import get_auth_agent
 
 load_dotenv()
 
@@ -40,7 +40,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ==================== ENDPOINTS ====================
+# ==================== MODELS ====================
+class AuthRequest(BaseModel):
+    query: str
+    thread_id: Optional[str] = None
+
+# ==================== AUTH AGENT ENDPOINTS ====================
+
+@app.post("/agent/auth")
+async def agent_auth(request: AuthRequest):
+    """Use LangGraph agent for authentication"""
+    try:
+        agent = get_auth_agent()
+        result = await agent.run(request.query, request.thread_id)
+        return {
+            "success": True,
+            "data": result
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ==================== EXISTING ENDPOINTS ====================
 
 @app.get("/")
 async def root():
@@ -342,7 +362,6 @@ def detect_timing_pattern(orders: List[Dict]) -> Dict:
         "orders_analyzed": len(orders)
     }
 
-# ==================== MAIN ====================
 
 if __name__ == "__main__":
     port = int(os.getenv("PATTERN_SERVICE_PORT", 8001))

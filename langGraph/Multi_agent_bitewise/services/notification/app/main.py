@@ -15,7 +15,6 @@ app = FastAPI(
     description="Sends real-time notifications using LangGraph Agent"
 )
 
-# ==================== CORS ====================
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -24,13 +23,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ==================== MODELS ====================
+
 class NotificationRequest(BaseModel):
     user_id: str
     query: str
     thread_id: Optional[str] = None
 
-# ==================== AGENT ENDPOINTS ====================
 
 @app.post("/agent/notify")
 async def agent_notify(request: NotificationRequest):
@@ -60,7 +58,6 @@ async def root():
         "agent": "LangGraph enabled"
     }
 
-# ==================== MAIN ====================
 
 if __name__ == "__main__":
     port = int(os.getenv("NOTIFICATION_SERVICE_PORT", 8003))
