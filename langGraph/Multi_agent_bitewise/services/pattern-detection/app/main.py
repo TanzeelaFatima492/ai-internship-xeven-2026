@@ -17,7 +17,7 @@ from pydantic import BaseModel
 
 from shared.database.models import User, Order
 from shared.database.database import get_db, engine, Base
-from auth_agent import get_auth_agent
+from agent import get_pattern_agent  # ✅ Pattern Agent only
 
 load_dotenv()
 
@@ -41,18 +41,19 @@ app.add_middleware(
 )
 
 # ==================== MODELS ====================
-class AuthRequest(BaseModel):
+class PatternRequest(BaseModel):
+    user_id: str
     query: str
     thread_id: Optional[str] = None
 
-# ==================== AUTH AGENT ENDPOINTS ====================
+# ==================== PATTERN AGENT ENDPOINT ====================
 
-@app.post("/agent/auth")
-async def agent_auth(request: AuthRequest):
-    """Use LangGraph agent for authentication"""
+@app.post("/agent/pattern")
+async def agent_pattern(request: PatternRequest):
+    """Use LangGraph agent for pattern analysis"""
     try:
-        agent = get_auth_agent()
-        result = await agent.run(request.query, request.thread_id)
+        agent = get_pattern_agent()
+        result = await agent.run(request.user_id, request.query, request.thread_id)
         return {
             "success": True,
             "data": result
@@ -362,6 +363,7 @@ def detect_timing_pattern(orders: List[Dict]) -> Dict:
         "orders_analyzed": len(orders)
     }
 
+# ==================== MAIN ====================
 
 if __name__ == "__main__":
     port = int(os.getenv("PATTERN_SERVICE_PORT", 8001))
