@@ -9,7 +9,6 @@ import json
 import uuid
 import requests
 
-# ==================== STATE ====================
 class SupervisorState(TypedDict):
     messages: Annotated[list, add_messages]
     user_id: str
@@ -102,7 +101,6 @@ def full_workflow(user_id: str) -> str:
     except Exception as e:
         return json.dumps({"success": False, "error": str(e)})
 
-# ==================== ALL TOOLS ====================
 SUPERVISOR_TOOLS = [
     analyze_user,
     generate_offers,
@@ -110,7 +108,7 @@ SUPERVISOR_TOOLS = [
     full_workflow
 ]
 
-# ==================== AGENT ====================
+
 class SupervisorAgent:
     def __init__(self, model: str = "llama3.2:1b"):
         self.model = model
@@ -152,7 +150,7 @@ class SupervisorAgent:
         final_response = messages[-1].content if messages else "No response"
         return {"user_id": user_id, "thread_id": thread_id, "response": final_response}
 
-# ==================== SINGLETON ====================
+
 supervisor = None
 
 def get_supervisor():
