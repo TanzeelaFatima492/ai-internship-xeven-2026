@@ -17,7 +17,7 @@ from pydantic import BaseModel
 
 from shared.database.models import User, Order
 from shared.database.database import get_db, engine, Base
-from agent import get_pattern_agent  # ✅ Pattern Agent only
+from .agent import get_pattern_agent 
 
 load_dotenv()
 
@@ -60,6 +60,62 @@ async def agent_pattern(request: PatternRequest):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# ==================== SEED ENDPOINT ====================
+
+@app.post("/seed/{user_id}")
+async def seed_user_data(user_id: str, db: Session = Depends(get_db)):
+    """Seed sample orders for a user to enable pattern detection"""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check if user already has orders
+    existing_orders = db.query(Order).filter(Order.user_id == user_id).count()
+    if existing_orders >= 3:
+        return {"message": f"User already has {existing_orders} orders. Data seeding skipped.", "user_id": user_id}
+    
+    # Sample menu items for seeding
+    sample_items_pool = [
+        [{"name": "Classic Cheeseburger", "price": 10.99, "category": "burger", "quantity": 1}],
+        [{"name": "French Fries", "price": 4.99, "category": "sides", "quantity": 1}],
+        [{"name": "Coca-Cola", "price": 2.99, "category": "drinks", "quantity": 1}],
+        [{"name": "Chicken Burger", "price": 12.99, "category": "burger", "quantity": 1}],
+        [{"name": "Milkshake", "price": 5.99, "category": "drinks", "quantity": 1}],
+        [{"name": "Classic Cheeseburger", "price": 10.99, "category": "burger", "quantity": 1}, {"name": "French Fries", "price": 4.99, "category": "sides", "quantity": 1}],
+        [{"name": "Pepperoni Pizza", "price": 17.99, "category": "pizza", "quantity": 1}],
+        [{"name": "Chocolate Brownie", "price": 6.99, "category": "desserts", "quantity": 1}],
+        [{"name": "Classic Cheeseburger", "price": 10.99, "category": "burger", "quantity": 1}, {"name": "French Fries", "price": 4.99, "category": "sides", "quantity": 1}, {"name": "Milkshake", "price": 5.99, "category": "drinks", "quantity": 1}],
+        [{"name": "Margherita Pizza", "price": 15.99, "category": "pizza", "quantity": 1}, {"name": "Coca-Cola", "price": 2.99, "category": "drinks", "quantity": 1}],
+    ]
+    
+    from datetime import timedelta
+    
+    # Create 5 sample orders with different timestamps
+    base_time = datetime.utcnow() - timedelta(days=14)
+    orders_created = 0
+    
+    for i in range(5):
+        items = sample_items_pool[i % len(sample_items_pool)]
+        total = sum(item.get("price", 0) * item.get("quantity", 1) for item in items)
+        
+        order = Order(
+            user_id=user_id,
+            items=items,
+            total=total,
+            status="delivered",
+            timestamp=base_time + timedelta(days=i * 3, hours=(i * 2) % 12)
+        )
+        db.add(order)
+        orders_created += 1
+    
+    db.commit()
+    
+    return {
+        "message": f"✅ Successfully seeded {orders_created} sample orders for user {user_id}",
+        "user_id": user_id,
+        "orders_created": orders_created
+    }
 
 # ==================== EXISTING ENDPOINTS ====================
 
