@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiteWise - Offers</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            color: #2d3436;
+        }
+
+        .navbar {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #6c5ce7;
+        }
+
+        .navbar .logo span {
+            color: #fdcb6e;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: #2d3436;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .navbar .nav-links a:hover {
+            background: #f0f0f0;
+        }
+
+        .navbar .nav-links a.active {
+            background: #6c5ce7;
+            color: white;
+        }
+
+        .navbar .nav-links .logout-btn {
+            background: #e17055;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .offers-header {
+            margin-bottom: 30px;
+        }
+
+        .offers-header h1 {
+            font-size: 28px;
+        }
+
+        .offers-header p {
+            color: #636e72;
+        }
+
+        .offers-header .generate-btn {
+            background: #6c5ce7;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .offers-header .generate-btn:hover {
+            background: #5a4bd1;
+        }
+
+        .offer-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #6c5ce7;
+            transition: transform 0.3s;
+        }
+
+        .offer-card:hover {
+            transform: translateX(4px);
+        }
+
+        .offer-card.high {
+            border-left-color: #e17055;
+        }
+
+        .offer-card.medium {
+            border-left-color: #fdcb6e;
+        }
+
+        .offer-card.low {
+            border-left-color: #74b9ff;
+        }
+
+        .offer-card .offer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .offer-card .offer-header .offer-type {
+            font-weight: 600;
+            color: #6c5ce7;
+        }
+
+        .offer-card .offer-header .offer-priority {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #dfe6e9;
+        }
+
+        .offer-card .offer-header .offer-priority.high {
+            background: #ffe0e0;
+            color: #c0392b;
+        }
+
+        .offer-card .offer-header .offer-priority.medium {
+            background: #ffeaa7;
+            color: #fdcb6e;
+        }
+
+        .offer-card .offer-header .offer-priority.low {
+            background: #dfe6e9;
+            color: #2d3436;
+        }
+
+        .offer-card .offer-message {
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        .offer-card .offer-discount {
+            display: inline-block;
+            background: #00b894;
+            color: white;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .offer-card .offer-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .offer-card .offer-actions button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .offer-card .offer-actions .apply-btn {
+            background: #6c5ce7;
+            color: white;
+        }
+
+        .offer-card .offer-actions .apply-btn:hover {
+            background: #5a4bd1;
+        }
+
+        .offer-card .offer-actions .claimed-btn {
+            background: #dfe6e9;
+            color: #636e72;
+            cursor: not-allowed;
+        }
+
+        .loader {
+            text-align: center;
+            padding: 40px;
+            color: #636e72;
+        }
+
+        .empty-offers {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+        }
+
+        .empty-offers .icon {
+            font-size: 64px;
+        }
+
+        .empty-offers h2 {
+            margin: 20px 0 10px;
+        }
+
+        .empty-offers p {
+            color: #636e72;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2d3436;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 999;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .navbar .nav-links {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">🍔 Bite<span>Wise</span></div>
+        <div class="nav-links">
+            <a href="dashboard.html">Home</a>
+            <a href="menu.html">Menu</a>
+            <a href="orders.html">Orders</a>
+            <a href="offers.html" class="active">Offers</a>
+            <a href="notifications.html">🔔 <span id="notifCount">0</span></a>
+            <a href="cart.html">🛒 Cart <span class="cart-badge" id="cartCount">0</span></a>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="offers-header">
+            <h1>🎁 Personalized Offers</h1>
+            <p>Special deals just for you</p>
+            <button class="generate-btn" onclick="generateOffers()">🔄 Generate Offers</button>
+        </div>
+
+        <div id="offersContainer">
+            <div class="loader">Loading offers...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_OFFERS = "http://localhost:8002";
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('user_id');
+
+        if (!token || !userId) window.location.href = 'auth.html';
+
+        let offers = [];
+
+        function updateCartBadge() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            document.getElementById('cartCount').textContent = cart.reduce((sum, i) => sum + i.quantity, 0);
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2500);
+        }
+
+        async function generateOffers() {
+            const container = document.getElementById('offersContainer');
+            container.innerHTML = '<div class="loader">Generating offers...</div>';
+
+            try {
+                const res = await fetch(`${API_BASE_OFFERS}/offers/generate/${userId}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.offers && data.offers.length > 0) {
+                    offers = data.offers;
+                    renderOffers(offers);
+                    showToast(`🎁 ${data.total_offers} offers generated!`);
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-offers">
+                            <div class="icon">🎁</div>
+                            <h2>No offers available</h2>
+                            <p>Try generating offers again later</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                container.innerHTML = '<p style="text-align:center;color:#e17055;">⚠️ Failed to generate offers</p>';
+                showToast('❌ Failed to generate offers');
+            }
+        }
+
+        function renderOffers(offers) {
+            const container = document.getElementById('offersContainer');
+
+            container.innerHTML = offers.map(offer => `
+                <div class="offer-card ${offer.priority || 'low'}">
+                    <div class="offer-header">
+                        <span class="offer-type">${offer.type || 'Special Offer'}</span>
+                        <span class="offer-priority ${offer.priority || 'low'}">${(offer.priority || 'low').toUpperCase()}</span>
+                    </div>
+                    <div class="offer-message">${offer.message || 'Special deal for you!'}</div>
+                    ${offer.discount ? `<div class="offer-discount">${offer.discount}</div>` : ''}
+                    <div class="offer-actions">
+                        <button class="apply-btn" onclick="applyOffer('${offer.type}')">Apply Offer</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function applyOffer(type) {
+            showToast(`✅ Offer '${type}' applied! Discount added to cart.`);
+            // In production: send to cart API
+        }
+
+        function logout() { localStorage.clear(); window.location.href = 'auth.html'; }
+
+        function connectWebSocket() {
+            const ws = new WebSocket(`ws://localhost:8003/ws/${userId}`);
+            ws.onmessage = (e) => {
+                try {
+                    const data = JSON.parse(e.data);
+                    if (data.type === 'new_notification') {
+                        document.getElementById('notifCount').textContent = parseInt(document.getElementById('notifCount').textContent) + 1;
+                    }
+                } catch (err) { }
+            };
+            ws.onclose = () => setTimeout(connectWebSocket, 3000);
+        }
+
+        window.onload = function () {
+            updateCartBadge();
+            generateOffers();
+            connectWebSocket();
+        };
+    </script>
+</body>
+
+</html>

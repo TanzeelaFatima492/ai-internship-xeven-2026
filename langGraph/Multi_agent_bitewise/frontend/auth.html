@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiteWise - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .auth-container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        .auth-container h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #2d3436;
+        }
+
+        .auth-container p {
+            text-align: center;
+            color: #636e72;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2d3436;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #6c5ce7;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #6c5ce7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #5a4bd1;
+        }
+
+        .toggle-text {
+            text-align: center;
+            margin-top: 15px;
+            color: #636e72;
+        }
+
+        .toggle-text a {
+            color: #6c5ce7;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .message.error {
+            background: #ffe0e0;
+            color: #c0392b;
+            display: block;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .loader.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container">
+        <h1>🍔 BiteWise</h1>
+        <p id="form-title">Welcome Back! Login to continue</p>
+
+        <div id="message" class="message"></div>
+        <div class="loader" id="loader">⏳ Loading...</div>
+
+        <form id="auth-form" onsubmit="handleSubmit(event)">
+            <div id="name-field" class="form-group" style="display: none;">
+                <label>Full Name</label>
+                <input type="text" id="name" placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Enter your password (min 8 chars)" required>
+            </div>
+            <div class="form-group" id="phone-field" style="display: none;">
+                <label>Phone (optional)</label>
+                <input type="text" id="phone" placeholder="Enter your phone number">
+            </div>
+            <button type="submit" class="btn" id="submit-btn">Login</button>
+        </form>
+
+        <div class="toggle-text">
+            <span id="toggle-text">Don't have an account? </span>
+            <a id="toggle-link" onclick="toggleMode()">Signup</a>
+        </div>
+    </div>
+
+    <script>
+        let isLoginMode = true;
+        const API_BASE = "http://localhost:8005";
+
+        function toggleMode() {
+            isLoginMode = !isLoginMode;
+            const title = document.getElementById('form-title');
+            const toggleText = document.getElementById('toggle-text');
+            const toggleLink = document.getElementById('toggle-link');
+            const nameField = document.getElementById('name-field');
+            const phoneField = document.getElementById('phone-field');
+            const submitBtn = document.getElementById('submit-btn');
+
+            if (isLoginMode) {
+                title.textContent = 'Welcome Back! Login to continue';
+                toggleText.textContent = "Don't have an account? ";
+                toggleLink.textContent = 'Signup';
+                nameField.style.display = 'none';
+                phoneField.style.display = 'none';
+                submitBtn.textContent = 'Login';
+            } else {
+                title.textContent = 'Create your BiteWise account!';
+                toggleText.textContent = "Already have an account? ";
+                toggleLink.textContent = 'Login';
+                nameField.style.display = 'block';
+                phoneField.style.display = 'block';
+                submitBtn.textContent = 'Signup';
+            }
+            document.getElementById('message').style.display = 'none';
+        }
+
+        function showMessage(msg, type = 'error') {
+            const el = document.getElementById('message');
+            el.textContent = msg;
+            el.className = `message ${type}`;
+            el.style.display = 'block';
+        }
+
+        function showLoader(show) {
+            document.getElementById('loader').classList.toggle('active', show);
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+            showLoader(true);
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (isLoginMode) {
+                // LOGIN
+                try {
+                    const res = await fetch(`${API_BASE}/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    const data = await res.json();
+                    showLoader(false);
+                    if (data.success) {
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('user_id', data.user_id);
+                        localStorage.setItem('user_name', data.name);
+                        localStorage.setItem('user_email', data.email);
+                        showMessage('✅ Login successful! Redirecting...', 'success');
+                        setTimeout(() => window.location.href = 'dashboard.html', 1500);
+                    } else {
+                        showMessage('❌ ' + (data.detail || 'Login failed'));
+                    }
+                } catch (err) {
+                    showLoader(false);
+                    showMessage('❌ Network error: ' + err.message);
+                }
+            } else {
+                // SIGNUP
+                const name = document.getElementById('name').value;
+                const phone = document.getElementById('phone').value || '';
+                try {
+                    const res = await fetch(`${API_BASE}/signup`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email, password, phone })
+                    });
+                    const data = await res.json();
+                    showLoader(false);
+                    if (data.success) {
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('user_id', data.user_id);
+                        localStorage.setItem('user_name', data.name);
+                        localStorage.setItem('user_email', data.email);
+                        showMessage('✅ Signup successful! Redirecting...', 'success');
+                        setTimeout(() => window.location.href = 'dashboard.html', 1500);
+                    } else {
+                        showMessage('❌ ' + (data.detail || 'Signup failed'));
+                    }
+                } catch (err) {
+                    showLoader(false);
+                    showMessage('❌ Network error: ' + err.message);
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

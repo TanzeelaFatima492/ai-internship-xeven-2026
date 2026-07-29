@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiteWise - Menu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            color: #2d3436;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #6c5ce7;
+        }
+
+        .navbar .logo span {
+            color: #fdcb6e;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: #2d3436;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .navbar .nav-links a:hover {
+            background: #f0f0f0;
+        }
+
+        .navbar .nav-links a.active {
+            background: #6c5ce7;
+            color: white;
+        }
+
+        .navbar .nav-links .cart-badge {
+            background: #e17055;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        .navbar .nav-links .logout-btn {
+            background: #e17055;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .menu-header h1 {
+            font-size: 28px;
+        }
+
+        .menu-header .search-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        .menu-header .search-box input {
+            padding: 10px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 250px;
+            font-size: 14px;
+        }
+
+        .menu-header .search-box input:focus {
+            outline: none;
+            border-color: #6c5ce7;
+        }
+
+        .menu-header .category-filter {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .menu-header .category-filter button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .menu-header .category-filter button:hover {
+            border-color: #6c5ce7;
+        }
+
+        .menu-header .category-filter button.active {
+            background: #6c5ce7;
+            color: white;
+            border-color: #6c5ce7;
+        }
+
+        /* Menu Grid */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .menu-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-4px);
+        }
+
+        .menu-item .item-image {
+            height: 160px;
+            background: linear-gradient(135deg, #dfe6e9, #b2bec3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        .menu-item .item-info {
+            padding: 15px;
+        }
+
+        .menu-item .item-info .item-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .menu-item .item-info .item-category {
+            font-size: 12px;
+            color: #636e72;
+            margin: 4px 0;
+        }
+
+        .menu-item .item-info .item-desc {
+            font-size: 14px;
+            color: #636e72;
+            margin: 8px 0;
+        }
+
+        .menu-item .item-info .item-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #6c5ce7;
+        }
+
+        .menu-item .item-info .add-btn {
+            background: #6c5ce7;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .menu-item .item-info .add-btn:hover {
+            background: #5a4bd1;
+        }
+
+        .loader {
+            text-align: center;
+            padding: 40px;
+            color: #636e72;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .navbar .nav-links {
+                justify-content: center;
+            }
+
+            .menu-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .menu-header .search-box input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="navbar">
+        <div class="logo">🍔 Bite<span>Wise</span></div>
+        <div class="nav-links">
+            <a href="dashboard.html">Home</a>
+            <a href="menu.html" class="active">Menu</a>
+            <a href="orders.html">Orders</a>
+            <a href="offers.html">Offers</a>
+            <a href="notifications.html">🔔 <span id="notifCount">0</span></a>
+            <a href="cart.html">🛒 Cart <span class="cart-badge" id="cartCount">0</span></a>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <!-- ==================== CONTAINER ==================== -->
+    <div class="container">
+
+        <!-- Menu Header -->
+        <div class="menu-header">
+            <h1>🍔 Our Menu</h1>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search food..." oninput="filterMenu()">
+            </div>
+            <div class="category-filter" id="categoryFilter">
+                <button class="active" data-category="all" onclick="filterCategory('all')">All</button>
+                <button data-category="burger" onclick="filterCategory('burger')">🍔 Burgers</button>
+                <button data-category="pizza" onclick="filterCategory('pizza')">🍕 Pizza</button>
+                <button data-category="sides" onclick="filterCategory('sides')">🍟 Sides</button>
+                <button data-category="drinks" onclick="filterCategory('drinks')">🥤 Drinks</button>
+                <button data-category="desserts" onclick="filterCategory('desserts')">🍰 Desserts</button>
+            </div>
+        </div>
+
+        <!-- Top Picks Section -->
+        <div class="top-picks"
+            style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px;">
+            <h2>⭐ Top Picks for You</h2>
+            <p style="color: #636e72; margin-bottom: 15px;">Based on your preferences</p>
+            <div id="topPicksGrid"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px;">
+                <div class="loader">Loading top picks...</div>
+            </div>
+        </div>
+
+        <!-- Menu Grid -->
+        <div class="menu-grid" id="menuGrid">
+            <div class="loader">Loading menu...</div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== CONFIG ====================
+        const API_BASE = "http://localhost:8001";
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('user_id');
+
+        if (!token || !userId) {
+            window.location.href = 'auth.html';
+        }
+
+        let menuItems = [];
+        let currentCategory = 'all';
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        // ==================== UPDATE CART BADGE ====================
+        function updateCartBadge() {
+            const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCount').textContent = total;
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        // ==================== FETCH MENU ====================
+        async function fetchMenu() {
+            try {
+                // Mock menu data (replace with real API)
+                const mockMenu = [
+                    { id: 1, name: 'Classic Cheeseburger', category: 'burger', price: 10.99, description: 'Juicy beef patty with cheddar cheese', emoji: '🍔' },
+                    { id: 2, name: 'Chicken Burger', category: 'burger', price: 12.99, description: 'Grilled chicken with lettuce', emoji: '🍗' },
+                    { id: 3, name: 'Margherita Pizza', category: 'pizza', price: 15.99, description: 'Classic tomato and mozzarella', emoji: '🍕' },
+                    { id: 4, name: 'Pepperoni Pizza', category: 'pizza', price: 17.99, description: 'Pepperoni with extra cheese', emoji: '🍕' },
+                    { id: 5, name: 'French Fries', category: 'sides', price: 4.99, description: 'Crispy golden fries', emoji: '🍟' },
+                    { id: 6, name: 'Onion Rings', category: 'sides', price: 5.99, description: 'Crispy onion rings', emoji: '🧅' },
+                    { id: 7, name: 'Coca-Cola', category: 'drinks', price: 2.99, description: 'Classic cola', emoji: '🥤' },
+                    { id: 8, name: 'Milkshake', category: 'drinks', price: 5.99, description: 'Creamy vanilla milkshake', emoji: '🥛' },
+                    { id: 9, name: 'Chocolate Brownie', category: 'desserts', price: 6.99, description: 'Warm brownie with ice cream', emoji: '🍫' },
+                    { id: 10, name: 'Cheesecake', category: 'desserts', price: 7.99, description: 'New York style cheesecake', emoji: '🍰' }
+                ];
+
+                menuItems = mockMenu;
+                renderMenu(menuItems);
+
+            } catch (error) {
+                console.error('Error fetching menu:', error);
+                document.getElementById('menuGrid').innerHTML = '<p>⚠️ Failed to load menu</p>';
+            }
+        }
+
+        // ==================== RENDER MENU ====================
+        function renderMenu(items) {
+            const grid = document.getElementById('menuGrid');
+
+            if (items.length === 0) {
+                grid.innerHTML = '<p style="text-align:center;color:#636e72;padding:40px;">No items found</p>';
+                return;
+            }
+
+            grid.innerHTML = items.map(item => `
+                <div class="menu-item" data-category="${item.category}">
+                    <div class="item-image">${item.emoji || '🍽️'}</div>
+                    <div class="item-info">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-category">${item.category}</div>
+                        <div class="item-desc">${item.description || ''}</div>
+                        <div class="item-price">$${item.price.toFixed(2)}</div>
+                        <button class="add-btn" onclick="addToCart(${item.id})">Add to Cart</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ==================== FILTER ====================
+        function filterCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('#categoryFilter button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`#categoryFilter button[data-category="${category}"]`)?.classList.add('active');
+            applyFilters();
+        }
+
+        function filterMenu() {
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = menuItems;
+
+            if (currentCategory !== 'all') {
+                filtered = filtered.filter(item => item.category === currentCategory);
+            }
+
+            if (search) {
+                filtered = filtered.filter(item => item.name.toLowerCase().includes(search) || item.category.includes(search));
+            }
+
+            renderMenu(filtered);
+        }
+
+        // ==================== ADD TO CART ====================
+        function addToCart(itemId) {
+            const item = menuItems.find(i => i.id === itemId);
+            if (!item) return;
+
+            const existing = cart.find(i => i.id === itemId);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ ...item, quantity: 1 });
+            }
+
+            updateCartBadge();
+            showToast(`✅ ${item.name} added to cart!`);
+        }
+
+        // ==================== TOAST ====================
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed; bottom: 20px; right: 20px; background: #2d3436; color: white;
+                padding: 12px 24px; border-radius: 8px; z-index: 999; animation: slideUp 0.3s ease;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        }
+
+        // ==================== LOGOUT ====================
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'auth.html';
+        }
+
+        // ==================== NOTIFICATIONS ====================
+        function connectWebSocket() {
+            const ws = new WebSocket(`ws://localhost:8003/ws/${userId}`);
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'new_notification') {
+                        const count = parseInt(document.getElementById('notifCount').textContent) + 1;
+                        document.getElementById('notifCount').textContent = count;
+                    }
+                } catch (e) { }
+            };
+            ws.onclose = () => setTimeout(connectWebSocket, 3000);
+        }
+
+        // ==================== TOP PICKS ====================
+            async function loadTopPicks() {
+                try {
+                    const response = await fetch(`${API_BASE}/user/${userId}/patterns`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const patterns = await response.json();
+                    const favorites = patterns.preferences?.favorites || [];
+
+                    const allItems = [
+                        { id: 1, name: 'Classic Cheeseburger', category: 'burger', price: 10.99, emoji: '🍔' },
+                        { id: 2, name: 'Chicken Burger', category: 'burger', price: 12.99, emoji: '🍗' },
+                        { id: 3, name: 'Margherita Pizza', category: 'pizza', price: 15.99, emoji: '🍕' },
+                        { id: 4, name: 'Pepperoni Pizza', category: 'pizza', price: 17.99, emoji: '🍕' },
+                        { id: 5, name: 'French Fries', category: 'sides', price: 4.99, emoji: '🍟' },
+                        { id: 6, name: 'Onion Rings', category: 'sides', price: 5.99, emoji: '🧅' },
+                        { id: 7, name: 'Coca-Cola', category: 'drinks', price: 2.99, emoji: '🥤' },
+                        { id: 8, name: 'Milkshake', category: 'drinks', price: 5.99, emoji: '🥛' },
+                        { id: 9, name: 'Chocolate Brownie', category: 'desserts', price: 6.99, emoji: '🍫' },
+                        { id: 10, name: 'Cheesecake', category: 'desserts', price: 7.99, emoji: '🍰' }
+                    ];
+
+                    const favNames = favorites.map(f => f.name);
+                    let topPicks = allItems.filter(item => favNames.includes(item.name));
+
+                    if (topPicks.length === 0) {
+                        // If no favorites, show popular items
+                        topPicks = allItems.slice(0, 4);
+                    }
+
+                    renderTopPicks(topPicks.slice(0, 4));
+                } catch (error) {
+                    console.error('Error loading top picks:', error);
+                }
+            }
+
+            function renderTopPicks(items) {
+                const grid = document.getElementById('topPicksGrid');
+
+                grid.innerHTML = items.map(item => `
+        <div style="background: #f8f9fa; border-radius: 12px; padding: 15px; text-align: center; transition: transform 0.3s; cursor: pointer;" 
+             onmouseover="this.style.transform='scale(1.03)'" 
+             onmouseout="this.style.transform='scale(1)'">
+            <div style="font-size: 40px;">${item.emoji || '🍽️'}</div>
+            <div style="font-weight: 600; margin: 8px 0;">${item.name}</div>
+            <div style="color: #6c5ce7; font-weight: 700;">$${item.price.toFixed(2)}</div>
+            <button onclick="addToCart(${item.id})" style="background: #6c5ce7; color: white; border: none; padding: 6px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 8px;">
+                Add to Cart
+            </button>
+        </div>
+    `).join('');
+            }
+
+            // Call loadTopPicks() in window.onload
+            window.onload = function () {
+                updateCartBadge();
+                fetchMenu();
+                loadTopPicks();
+                connectWebSocket();
+            };
+            
+        // ==================== LOAD ====================
+        window.onload = function () {
+            updateCartBadge();
+            fetchMenu();
+            connectWebSocket();
+        };
+
+        // Add style for toast animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideUp {
+                from { transform: translateY(100px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+
+</html>

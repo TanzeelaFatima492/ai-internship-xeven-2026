@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiteWise - Notifications</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            color: #2d3436;
+        }
+
+        .navbar {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #6c5ce7;
+        }
+
+        .navbar .logo span {
+            color: #fdcb6e;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: #2d3436;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .navbar .nav-links a:hover {
+            background: #f0f0f0;
+        }
+
+        .navbar .nav-links a.active {
+            background: #6c5ce7;
+            color: white;
+        }
+
+        .navbar .nav-links .logout-btn {
+            background: #e17055;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .notif-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .notif-header h1 {
+            font-size: 28px;
+        }
+
+        .notif-header .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .notif-header .actions button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .notif-header .actions .mark-read-btn {
+            background: #6c5ce7;
+            color: white;
+        }
+
+        .notif-header .actions .mark-read-btn:hover {
+            background: #5a4bd1;
+        }
+
+        .notif-header .actions .delete-all-btn {
+            background: #e17055;
+            color: white;
+        }
+
+        .notif-header .actions .delete-all-btn:hover {
+            background: #d63031;
+        }
+
+        .notif-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.3s;
+            border-left: 4px solid #dfe6e9;
+        }
+
+        .notif-item:hover {
+            transform: translateX(4px);
+        }
+
+        .notif-item.unread {
+            border-left-color: #e17055;
+            background: #fff5f5;
+        }
+
+        .notif-item .notif-content {
+            flex: 1;
+        }
+
+        .notif-item .notif-content .message {
+            font-weight: 500;
+        }
+
+        .notif-item .notif-content .time {
+            font-size: 12px;
+            color: #636e72;
+        }
+
+        .notif-item .notif-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .notif-item .notif-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .notif-item .notif-actions .read-btn {
+            color: #6c5ce7;
+        }
+
+        .notif-item .notif-actions .read-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .notif-item .notif-actions .delete-btn {
+            color: #e17055;
+        }
+
+        .notif-item .notif-actions .delete-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .loader {
+            text-align: center;
+            padding: 40px;
+            color: #636e72;
+        }
+
+        .empty-notif {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+        }
+
+        .empty-notif .icon {
+            font-size: 64px;
+        }
+
+        .empty-notif h2 {
+            margin: 20px 0 10px;
+        }
+
+        .empty-notif p {
+            color: #636e72;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2d3436;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 999;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .navbar .nav-links {
+                justify-content: center;
+            }
+
+            .notif-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .notif-item .notif-actions {
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">🍔 Bite<span>Wise</span></div>
+        <div class="nav-links">
+            <a href="dashboard.html">Home</a>
+            <a href="menu.html">Menu</a>
+            <a href="orders.html">Orders</a>
+            <a href="offers.html">Offers</a>
+            <a href="notifications.html" class="active">🔔 <span id="notifCount">0</span></a>
+            <a href="cart.html">🛒 Cart <span class="cart-badge" id="cartCount">0</span></a>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="notif-header">
+            <h1>🔔 Notifications</h1>
+            <div class="actions">
+                <button class="mark-read-btn" onclick="markAllRead()">✅ Mark All Read</button>
+                <button class="delete-all-btn" onclick="deleteAll()">🗑️ Delete All</button>
+            </div>
+        </div>
+
+        <div id="notifContainer">
+            <div class="loader">Loading notifications...</div>
+        </div>
+    </div>
+
+    <!-- Offer Detail Modal -->
+    <div id="offerModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div
+            style="background: white; max-width: 500px; width: 90%; padding: 30px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: #6c5ce7;">🎁 Offer Details</h2>
+                <button onclick="closeOfferModal()"
+                    style="background: none; border: none; font-size: 24px; cursor: pointer; color: #636e72;">✕</button>
+            </div>
+            <div id="offerDetailContent">
+                <div class="loader">Loading offer...</div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const API_BASE = "http://localhost:8003";
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('user_id');
+
+        if (!token || !userId) window.location.href = 'auth.html';
+
+        let notifications = [];
+
+        function updateBadge() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            document.getElementById('cartCount').textContent = cart.reduce((s, i) => s + i.quantity, 0);
+            const unread = notifications.filter(n => !n.read).length;
+            document.getElementById('notifCount').textContent = unread;
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2500);
+        }
+
+        async function fetchNotifications() {
+            const container = document.getElementById('notifContainer');
+            try {
+                const res = await fetch(`${API_BASE}/notifications/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                notifications = data.notifications || [];
+                renderNotifications(notifications);
+                updateBadge();
+            } catch (error) {
+                container.innerHTML = '<p style="text-align:center;color:#e17055;">⚠️ Failed to load notifications</p>';
+            }
+        }
+
+       // ==================== RENDER NOTIFICATIONS (Updated) ====================
+function renderNotifications(list) {
+    const container = document.getElementById('notifContainer');
+    if (!list || list.length === 0) {
+        container.innerHTML = `
+            <div class="empty-notif">
+                <div class="icon">📭</div>
+                <h2>No notifications</h2>
+                <p>You're all caught up!</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = list.map(n => `
+        <div class="notif-item ${n.read ? '' : 'unread'}" onclick="openOfferDetail('${n.id}')" style="cursor: pointer;">
+            <div class="notif-content">
+                <div class="message">${n.message}</div>
+                <div class="time">${new Date(n.created_at).toLocaleString()}</div>
+                ${n.type === 'offer' ? '<span style="background: #6c5ce7; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">🎁 Offer</span>' : ''}
+            </div>
+            <div class="notif-actions" onclick="event.stopPropagation();">
+                ${!n.read ? `<button class="read-btn" onclick="markRead('${n.id}')">✅ Mark Read</button>` : ''}
+                <button class="delete-btn" onclick="deleteOne('${n.id}')">🗑️</button>
+            </div>
+        </div>
+    `).join('');
+    updateBadge();
+}
+
+       async function markRead(id) {
+            try {
+                await fetch(`${API_BASE}/notifications/${userId}/${id}/read`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const n = notifications.find(n => n.id === id);
+                if (n) n.read = true;
+                renderNotifications(notifications);
+                // Don't show toast when called from openOfferDetail
+                if (!document.getElementById('offerModal').style.display === 'flex') {
+                    showToast('✅ Marked as read');
+                }
+            } catch (error) { showToast('❌ Failed to mark as read'); }
+        }
+
+        
+        async function markAllRead() {
+            try {
+                await fetch(`${API_BASE}/notifications/${userId}/read-all`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                notifications.forEach(n => n.read = true);
+                renderNotifications(notifications);
+                showToast('✅ All marked as read');
+            } catch (error) { showToast('❌ Failed to mark all as read'); }
+        }
+
+        // ==================== OFFER DETAIL ====================
+            let currentOfferId = null;
+
+            async function openOfferDetail(notificationId) {
+                const modal = document.getElementById('offerModal');
+                const content = document.getElementById('offerDetailContent');
+
+                modal.style.display = 'flex';
+                content.innerHTML = '<div class="loader">Loading offer...</div>';
+
+                try {
+                    // Find notification
+                    const notification = notifications.find(n => n.id === notificationId);
+                    if (!notification) {
+                        content.innerHTML = '<p style="color:#e17055;">⚠️ Notification not found</p>';
+                        return;
+                    }
+
+                    // If notification has offer data
+                    if (notification.offer) {
+                        renderOfferDetail(notification.offer);
+                        currentOfferId = notificationId;
+                        // Mark as read automatically
+                        await markRead(notificationId);
+                    } else {
+                        // Try to fetch offer from offer service
+                        const res = await fetch(`${API_BASE_OFFERS}/offers/user/${userId}/latest`, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        const data = await res.json();
+                        if (data.offer) {
+                            renderOfferDetail(data.offer);
+                            currentOfferId = notificationId;
+                            await markRead(notificationId);
+                        } else {
+                            content.innerHTML = '<p style="color:#636e72;">No offer associated with this notification</p>';
+                        }
+                    }
+                } catch (error) {
+                    content.innerHTML = '<p style="color:#e17055;">⚠️ Failed to load offer details</p>';
+                }
+            }
+
+            function renderOfferDetail(offer) {
+                const content = document.getElementById('offerDetailContent');
+
+                const priorityColors = {
+                    high: '#e17055',
+                    medium: '#fdcb6e',
+                    low: '#74b9ff'
+                };
+
+                content.innerHTML = `
+        <div style="border-left: 5px solid ${priorityColors[offer.priority] || '#6c5ce7'}; padding-left: 15px; margin-bottom: 20px;">
+            <div style="font-size: 14px; color: #636e72; text-transform: uppercase;">${offer.type || 'Special Offer'}</div>
+            <div style="font-size: 20px; font-weight: 700; margin: 10px 0;">${offer.message || 'Special deal for you!'}</div>
+            <div style="display: inline-block; background: #00b894; color: white; padding: 4px 16px; border-radius: 20px; font-weight: 600; font-size: 14px;">
+                ${offer.discount || 'Special Discount'}
+            </div>
+        </div>
+        
+        <div style="background: #f8f9fa; border-radius: 12px; padding: 15px; margin: 15px 0;">
+            <div style="display: flex; justify-content: space-between; padding: 6px 0;">
+                <span style="color: #636e72;">Priority</span>
+                <span style="font-weight: 600; text-transform: uppercase;">${offer.priority || 'Low'}</span>
+            </div>
+            ${offer.validity ? `
+                <div style="display: flex; justify-content: space-between; padding: 6px 0;">
+                    <span style="color: #636e72;">Valid Till</span>
+                    <span style="font-weight: 600;">${offer.validity}</span>
+                </div>
+            ` : ''}
+            ${offer.items ? `
+                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0;">
+                    <span style="color: #636e72;">Items:</span>
+                    <div style="margin-top: 5px;">
+                        ${offer.items.map(item => `
+                            <span style="background: #dfe6e9; padding: 4px 12px; border-radius: 12px; margin: 3px; display: inline-block;">${item}</span>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button onclick="applyOfferAndProceed('${offer.type || 'offer'}')" style="flex: 1; padding: 14px; background: #6c5ce7; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.3s;">
+                🚀 Proceed with Offer
+            </button>
+            <button onclick="closeOfferModal()" style="padding: 14px 24px; background: #dfe6e9; color: #2d3436; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; transition: background 0.3s;">
+                Cancel
+            </button>
+        </div>
+    `;
+            }
+
+            function applyOfferAndProceed(offerType) {
+                // Apply offer to cart
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+                // Add offer items to cart (if any)
+                // For now, just show toast and redirect to cart
+                showToast(`✅ Offer '${offerType}' applied to your cart!`);
+                closeOfferModal();
+                setTimeout(() => window.location.href = 'cart.html', 800);
+            }
+
+            function closeOfferModal() {
+                document.getElementById('offerModal').style.display = 'none';
+                currentOfferId = null;
+            }
+
+            // Click outside modal to close
+            window.onclick = function (event) {
+                const modal = document.getElementById('offerModal');
+                if (event.target === modal) {
+                    closeOfferModal();
+                }
+            };
+
+        async function deleteOne(id) {
+            try {
+                await fetch(`${API_BASE}/notifications/${userId}/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                notifications = notifications.filter(n => n.id !== id);
+                renderNotifications(notifications);
+                showToast('🗑️ Deleted');
+            } catch (error) { showToast('❌ Failed to delete'); }
+        }
+
+        async function deleteAll() {
+            if (!confirm('Delete all notifications?')) return;
+            try {
+                // Delete one by one (or bulk API if available)
+                for (const n of notifications) {
+                    await fetch(`${API_BASE}/notifications/${userId}/${n.id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                }
+                notifications = [];
+                renderNotifications(notifications);
+                showToast('🗑️ All deleted');
+            } catch (error) { showToast('❌ Failed to delete all'); }
+        }
+
+        function logout() { localStorage.clear(); window.location.href = 'auth.html'; }
+
+        function connectWebSocket() {
+            const ws = new WebSocket(`ws://localhost:8003/ws/${userId}`);
+            ws.onmessage = (e) => {
+                try {
+                    const data = JSON.parse(e.data);
+                    if (data.type === 'new_notification') {
+                        notifications.unshift(data.data);
+                        renderNotifications(notifications);
+                        showToast('🔔 New notification!');
+                    }
+                } catch (err) { }
+            };
+            ws.onclose = () => setTimeout(connectWebSocket, 3000);
+        }
+
+        window.onload = function () {
+            updateBadge();
+            fetchNotifications();
+            connectWebSocket();
+        };
+    </script>
+</body>
+
+</html>

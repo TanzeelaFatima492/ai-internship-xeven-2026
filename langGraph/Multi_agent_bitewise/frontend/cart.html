@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiteWise - Cart</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            color: #2d3436;
+        }
+
+        .navbar {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #6c5ce7;
+        }
+
+        .navbar .logo span {
+            color: #fdcb6e;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: #2d3436;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .navbar .nav-links a:hover {
+            background: #f0f0f0;
+        }
+
+        .navbar .nav-links a.active {
+            background: #6c5ce7;
+            color: white;
+        }
+
+        .navbar .nav-links .cart-badge {
+            background: #e17055;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        .navbar .nav-links .logout-btn {
+            background: #e17055;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .cart-header h1 {
+            font-size: 28px;
+        }
+
+        .cart-header .clear-btn {
+            background: #e17055;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+        }
+
+        .empty-cart .icon {
+            font-size: 64px;
+        }
+
+        .empty-cart h2 {
+            margin: 20px 0 10px;
+        }
+
+        .empty-cart p {
+            color: #636e72;
+        }
+
+        .empty-cart a {
+            display: inline-block;
+            margin-top: 20px;
+            background: #6c5ce7;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .cart-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .cart-item .item-info {
+            flex: 1;
+        }
+
+        .cart-item .item-info .name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .cart-item .item-info .category {
+            font-size: 12px;
+            color: #636e72;
+        }
+
+        .cart-item .item-info .price {
+            font-weight: 700;
+            color: #6c5ce7;
+        }
+
+        .cart-item .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cart-item .qty-control button {
+            background: #dfe6e9;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .cart-item .qty-control button:hover {
+            background: #b2bec3;
+        }
+
+        .cart-item .qty-control .qty {
+            font-weight: 600;
+            font-size: 16px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .cart-item .remove-btn {
+            background: #e17055;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .cart-summary {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .cart-summary .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        .cart-summary .row.total {
+            font-size: 20px;
+            font-weight: 700;
+            border-top: 2px solid #f0f0f0;
+            padding-top: 15px;
+            margin-top: 10px;
+        }
+
+        .cart-summary .place-order-btn {
+            width: 100%;
+            padding: 14px;
+            background: #00b894;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+
+        .cart-summary .place-order-btn:hover {
+            background: #00997a;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2d3436;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 999;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .navbar .nav-links {
+                justify-content: center;
+            }
+
+            .cart-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .cart-item .qty-control {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="navbar">
+        <div class="logo">🍔 Bite<span>Wise</span></div>
+        <div class="nav-links">
+            <a href="dashboard.html">Home</a>
+            <a href="menu.html">Menu</a>
+            <a href="orders.html">Orders</a>
+            <a href="offers.html">Offers</a>
+            <a href="notifications.html">🔔 <span id="notifCount">0</span></a>
+            <a href="cart.html" class="active">🛒 Cart <span class="cart-badge" id="cartCount">0</span></a>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <!-- ==================== CONTAINER ==================== -->
+    <div class="container">
+        <div class="cart-header">
+            <h1>🛒 Your Cart</h1>
+            <button class="clear-btn" onclick="clearCart()">🗑️ Clear Cart</button>
+        </div>
+
+        
+
+        <div id="cartContainer">
+            <div class="empty-cart">
+                <div class="icon">🛒</div>
+                <h2>Your cart is empty</h2>
+                <p>Browse our menu and add your favorite items!</p>
+                <a href="menu.html">Browse Menu</a>
+            </div>
+        </div>
+
+        <div id="cartSummary" style="display:none;"></div>
+        <!-- You might also like -->
+        <div class="recommendations-section"
+            style="background: white; padding: 25px; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-top: 30px;">
+            <h2>🔄 You might also like</h2>
+            <p style="color: #636e72; margin-bottom: 15px;">Based on items in your cart</p>
+            <div id="cartRecommendations"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px;">
+                <div class="loader">Loading recommendations...</div>
+            </div>
+        </div> 
+    </div>
+
+    <script>
+        // ==================== CONFIG ====================
+        const API_BASE = "http://localhost:8001";
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('user_id');
+
+        if (!token || !userId) {
+            window.location.href = 'auth.html';
+        }
+
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        // ==================== UPDATE BADGE ====================
+        function updateBadge() {
+            const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCount').textContent = total;
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        // ==================== RENDER CART ====================
+        function renderCart() {
+            const container = document.getElementById('cartContainer');
+            const summaryContainer = document.getElementById('cartSummary');
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-cart">
+                        <div class="icon">🛒</div>
+                        <h2>Your cart is empty</h2>
+                        <p>Browse our menu and add your favorite items!</p>
+                        <a href="menu.html">Browse Menu</a>
+                    </div>
+                `;
+                summaryContainer.style.display = 'none';
+                updateBadge();
+                return;
+            }
+
+            container.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <div class="item-info">
+                        <div class="name">${item.emoji || '🍽️'} ${item.name}</div>
+                        <div class="category">${item.category}</div>
+                        <div class="price">$${(item.price * item.quantity).toFixed(2)}</div>
+                    </div>
+                    <div class="qty-control">
+                        <button onclick="updateQty(${item.id}, -1)">−</button>
+                        <span class="qty">${item.quantity}</span>
+                        <button onclick="updateQty(${item.id}, 1)">+</button>
+                    </div>
+                    <button class="remove-btn" onclick="removeItem(${item.id})">Remove</button>
+                </div>
+            `).join('');
+
+            // Summary
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const tax = subtotal * 0.08;
+            const total = subtotal + tax;
+
+            summaryContainer.style.display = 'block';
+            summaryContainer.innerHTML = `
+                <div class="cart-summary">
+                    <div class="row"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
+                    <div class="row"><span>Tax (8%)</span><span>$${tax.toFixed(2)}</span></div>
+                    <div class="row total"><span>Total</span><span>$${total.toFixed(2)}</span></div>
+                    <button class="place-order-btn" onclick="placeOrder()">🍔 Place Order</button>
+                </div>
+            `;
+
+            updateBadge();
+        }
+
+        // ==================== UPDATE QUANTITY ====================
+        function updateQty(itemId, delta) {
+            const item = cart.find(i => i.id === itemId);
+            if (!item) return;
+
+            const newQty = item.quantity + delta;
+            if (newQty <= 0) {
+                removeItem(itemId);
+                return;
+            }
+
+            item.quantity = newQty;
+            renderCart();
+            showToast(`🔄 Updated ${item.name}`);
+        }
+
+        // ==================== REMOVE ITEM ====================
+        function removeItem(itemId) {
+            const item = cart.find(i => i.id === itemId);
+            cart = cart.filter(i => i.id !== itemId);
+            renderCart();
+            if (item) showToast(`🗑️ Removed ${item.name}`);
+        }
+
+        // ==================== CART RECOMMENDATIONS ====================
+            async function loadCartRecommendations() {
+                const container = document.getElementById('cartRecommendations');
+
+                if (cart.length === 0) {
+                    container.innerHTML = '<p style="color:#636e72;text-align:center;">Add items to cart to get recommendations! 🛒</p>';
+                    return;
+                }
+
+                try {
+                    const patterns = await fetch(`${API_BASE}/user/${userId}/patterns`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await patterns.json();
+                    const combos = data.preferences?.combos || [];
+                    const favorites = data.preferences?.favorites || [];
+
+                    // Get recommended items based on cart items + combos
+                    const recommended = getCartRecommendations(combos, favorites);
+                    renderCartRecommendations(recommended);
+                } catch (error) {
+                    console.error('Error loading recommendations:', error);
+                    container.innerHTML = '<p style="color:#e17055;text-align:center;">⚠️ Failed to load recommendations</p>';
+                }
+            }
+
+            function getCartRecommendations(combos, favorites) {
+                const allItems = [
+                    { id: 1, name: 'Classic Cheeseburger', category: 'burger', price: 10.99, emoji: '🍔' },
+                    { id: 2, name: 'Chicken Burger', category: 'burger', price: 12.99, emoji: '🍗' },
+                    { id: 3, name: 'Margherita Pizza', category: 'pizza', price: 15.99, emoji: '🍕' },
+                    { id: 4, name: 'Pepperoni Pizza', category: 'pizza', price: 17.99, emoji: '🍕' },
+                    { id: 5, name: 'French Fries', category: 'sides', price: 4.99, emoji: '🍟' },
+                    { id: 6, name: 'Onion Rings', category: 'sides', price: 5.99, emoji: '🧅' },
+                    { id: 7, name: 'Coca-Cola', category: 'drinks', price: 2.99, emoji: '🥤' },
+                    { id: 8, name: 'Milkshake', category: 'drinks', price: 5.99, emoji: '🥛' },
+                    { id: 9, name: 'Chocolate Brownie', category: 'desserts', price: 6.99, emoji: '🍫' },
+                    { id: 10, name: 'Cheesecake', category: 'desserts', price: 7.99, emoji: '🍰' }
+                ];
+
+                const cartNames = cart.map(item => item.name);
+                const cartCategories = cart.map(item => item.category);
+
+                // Find items similar to cart items
+                let recommended = allItems.filter(item =>
+                    cartCategories.includes(item.category) &&
+                    !cartNames.includes(item.name)
+                );
+
+                // Add combo items
+                combos.forEach(combo => {
+                    combo.items.forEach(itemName => {
+                        const found = allItems.find(i => i.name === itemName);
+                        if (found && !cartNames.includes(found.name) && !recommended.find(r => r.id === found.id)) {
+                            recommended.push(found);
+                        }
+                    });
+                });
+
+                // Remove duplicates and limit to 6
+                return recommended.slice(0, 6);
+            }
+
+            function renderCartRecommendations(items) {
+                const container = document.getElementById('cartRecommendations');
+
+                if (!items || items.length === 0) {
+                    container.innerHTML = '<p style="color:#636e72;text-align:center;">No recommendations available 🍔</p>';
+                    return;
+                }
+
+                container.innerHTML = items.map(item => `
+        <div style="background: #f8f9fa; border-radius: 12px; padding: 15px; text-align: center; transition: transform 0.3s; cursor: pointer;" 
+             onmouseover="this.style.transform='scale(1.03)'" 
+             onmouseout="this.style.transform='scale(1)'">
+            <div style="font-size: 40px;">${item.emoji || '🍽️'}</div>
+            <div style="font-weight: 600; margin: 8px 0;">${item.name}</div>
+            <div style="color: #6c5ce7; font-weight: 700;">$${item.price.toFixed(2)}</div>
+            <button onclick="addToCartFromRecommendation(${item.id})" style="background: #6c5ce7; color: white; border: none; padding: 6px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 8px;">
+                Add to Cart
+            </button>
+        </div>
+    `).join('');
+            }
+
+            function addToCartFromRecommendation(itemId) {
+                const allItems = [
+                    { id: 1, name: 'Classic Cheeseburger', price: 10.99, emoji: '🍔' },
+                    { id: 2, name: 'Chicken Burger', price: 12.99, emoji: '🍗' },
+                    { id: 3, name: 'Margherita Pizza', price: 15.99, emoji: '🍕' },
+                    { id: 4, name: 'Pepperoni Pizza', price: 17.99, emoji: '🍕' },
+                    { id: 5, name: 'French Fries', price: 4.99, emoji: '🍟' },
+                    { id: 6, name: 'Onion Rings', price: 5.99, emoji: '🧅' },
+                    { id: 7, name: 'Coca-Cola', price: 2.99, emoji: '🥤' },
+                    { id: 8, name: 'Milkshake', price: 5.99, emoji: '🥛' },
+                    { id: 9, name: 'Chocolate Brownie', price: 6.99, emoji: '🍫' },
+                    { id: 10, name: 'Cheesecake', price: 7.99, emoji: '🍰' }
+                ];
+
+                const item = allItems.find(i => i.id === itemId);
+                if (!item) return;
+
+                const existing = cart.find(i => i.id === itemId);
+                if (existing) {
+                    existing.quantity += 1;
+                } else {
+                    cart.push({ ...item, quantity: 1 });
+                }
+
+                renderCart();
+                loadCartRecommendations();
+                showToast(`✅ ${item.name} added to cart!`);
+            }
+
+        // ==================== CLEAR CART ====================
+        function clearCart() {
+            if (cart.length === 0) return;
+            if (!confirm('Clear all items from cart?')) return;
+            cart = [];
+            renderCart();
+            showToast('🗑️ Cart cleared');
+        }
+
+        // ==================== PLACE ORDER ====================
+        async function placeOrder() {
+            if (cart.length === 0) {
+                showToast('❌ Cart is empty!');
+                return;
+            }
+
+            try {
+                const orderItems = cart.map(item => ({
+                    name: item.name,
+                    price: item.price,
+                    category: item.category,
+                    quantity: item.quantity
+                }));
+
+                const response = await fetch(`${API_BASE}/user/${userId}/order`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(orderItems)
+                });
+
+                const data = await response.json();
+
+                if (data.message) {
+                    cart = [];
+                    renderCart();
+                    showToast('✅ Order placed successfully! 🎉');
+                    setTimeout(() => window.location.href = 'orders.html', 1500);
+                } else {
+                    showToast('❌ Failed to place order');
+                }
+            } catch (error) {
+                console.error('Order error:', error);
+                showToast('❌ Failed to place order');
+            }
+        }
+
+        // ==================== TOAST ====================
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        }
+
+        // ==================== LOGOUT ====================
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'auth.html';
+        }
+
+        // ==================== NOTIFICATIONS ====================
+        function connectWebSocket() {
+            const ws = new WebSocket(`ws://localhost:8003/ws/${userId}`);
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'new_notification') {
+                        const count = parseInt(document.getElementById('notifCount').textContent) + 1;
+                        document.getElementById('notifCount').textContent = count;
+                    }
+                } catch (e) { }
+            };
+            ws.onclose = () => setTimeout(connectWebSocket, 3000);
+        }
+
+        // ==================== LOAD ====================
+        window.onload = function () {
+                renderCart();
+                loadCartRecommendations();
+                connectWebSocket();
+            };
+    </script>
+</body>
+
+</html>

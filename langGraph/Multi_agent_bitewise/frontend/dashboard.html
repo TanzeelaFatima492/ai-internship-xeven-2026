@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiteWise - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            color: #2d3436;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #6c5ce7;
+        }
+
+        .navbar .logo span {
+            color: #fdcb6e;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: #2d3436;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .navbar .nav-links a:hover {
+            background: #f0f0f0;
+        }
+
+        .navbar .nav-links a.active {
+            background: #6c5ce7;
+            color: white;
+        }
+
+        .navbar .nav-links .user-info {
+            font-weight: 600;
+            color: #6c5ce7;
+            margin-right: 10px;
+        }
+
+        .navbar .nav-links .logout-btn {
+            background: #e17055;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .navbar .nav-links .logout-btn:hover {
+            background: #d63031;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Welcome Section */
+        .welcome {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .welcome h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .welcome p {
+            color: #636e72;
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .stat-card .icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d3436;
+        }
+
+        .stat-card .label {
+            font-size: 14px;
+            color: #636e72;
+            margin-top: 5px;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .quick-btn {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            text-decoration: none;
+            color: #2d3436;
+            display: block;
+        }
+
+        .quick-btn:hover {
+            border-color: #6c5ce7;
+            transform: translateY(-4px);
+        }
+
+        .quick-btn .icon {
+            font-size: 30px;
+        }
+
+        .quick-btn .label {
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .profile-card h2 {
+            margin-bottom: 15px;
+        }
+
+        .profile-card .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .profile-card .row:last-child {
+            border-bottom: none;
+        }
+
+        .profile-card .label {
+            font-weight: 600;
+            color: #636e72;
+        }
+
+        .profile-card .value {
+            color: #2d3436;
+        }
+
+        /* Recent Orders */
+        .orders-section {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .orders-section h2 {
+            margin-bottom: 15px;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-item .order-info .items {
+            font-weight: 600;
+        }
+
+        .order-item .order-info .date {
+            font-size: 12px;
+            color: #636e72;
+        }
+
+        .order-item .order-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .order-status.pending {
+            background: #ffeaa7;
+            color: #fdcb6e;
+        }
+
+        .order-status.completed {
+            background: #dfe6e9;
+            color: #2d3436;
+        }
+
+        .order-status.delivered {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .loader {
+            text-align: center;
+            padding: 20px;
+            color: #636e72;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .navbar .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="navbar">
+        <div class="logo">🍔 Bite<span>Wise</span></div>
+        <div class="nav-links">
+            <span class="user-info" id="userName">👤 Loading...</span>
+            <a href="dashboard.html" class="active">Home</a>
+            <a href="menu.html">Menu</a>
+            <a href="orders.html">Orders</a>
+            <a href="offers.html">Offers</a>
+            <a href="notifications.html">🔔 <span id="notifCount">0</span></a>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <!-- ==================== CONTAINER ==================== -->
+    <div class="container">
+
+        <!-- Welcome -->
+        <div class="welcome">
+            <h1 id="welcomeMsg">Welcome back! 👋</h1>
+            <p id="welcomeSub">Here's your food journey summary</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats" id="statsContainer">
+            <div class="stat-card">
+                <div class="icon">📦</div>
+                <div class="number" id="totalOrders">-</div>
+                <div class="label">Total Orders</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">🔥</div>
+                <div class="number" id="streak">-</div>
+                <div class="label">Day Streak</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">💰</div>
+                <div class="number" id="totalSpent">-</div>
+                <div class="label">Total Spent</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">🎁</div>
+                <div class="number" id="offersCount">-</div>
+                <div class="label">Active Offers</div>
+            </div>
+        </div>
+
+        <!-- Recommendations Section -->
+        <div class="recommendations-section"
+            style="background: white; padding: 25px; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px;">
+            <h2>🍔 Recommended for You</h2>
+            <p style="color: #636e72; margin-bottom: 15px;">Based on your past orders</p>
+            <div id="recommendationsGrid"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px;">
+                <div class="loader">Loading recommendations...</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="menu.html" class="quick-btn">
+                <div class="icon">🍔</div>
+                <div class="label">Browse Menu</div>
+            </a>
+            <a href="offers.html" class="quick-btn">
+                <div class="icon">🎁</div>
+                <div class="label">View Offers</div>
+            </a>
+            <a href="orders.html" class="quick-btn">
+                <div class="icon">📦</div>
+                <div class="label">My Orders</div>
+            </a>
+            <a href="notifications.html" class="quick-btn">
+                <div class="icon">🔔</div>
+                <div class="label">Notifications</div>
+            </a>
+        </div>
+
+    <script>
+        // ==================== CONFIG ====================
+        const API_BASE = "http://localhost:8001";
+
+        // ==================== CHECK AUTH ====================
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('user_id');
+        const userName = localStorage.getItem('user_name');
+
+        if (!token || !userId) {
+            window.location.href = 'auth.html';
+        }
+
+        // ==================== SET USER ====================
+        document.getElementById('userName').textContent = `👤 ${userName || 'User'}`;
+        document.getElementById('welcomeMsg').textContent = `Welcome back, ${userName || 'User'}! 👋`;
+        document.getElementById('profileName').textContent = userName || '-';
+
+        // ==================== API HELPERS ====================
+        async function fetchWithAuth(url) {
+            const response = await fetch(url, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            return response.json();
+        }
+
+        // ==================== LOAD DASHBOARD DATA ====================
+        async function loadDashboard() {
+            try {
+                // 1. Get user patterns
+                const patterns = await fetchWithAuth(`${API_BASE}/user/${userId}/patterns`);
+                console.log('Patterns:', patterns);
+
+                if (patterns.total_orders !== undefined) {
+                    document.getElementById('totalOrders').textContent = patterns.total_orders;
+                    document.getElementById('streak').textContent = patterns.streak || 0;
+                    document.getElementById('totalSpent').textContent = `$${patterns.spending?.total_spent || 0}`;
+                    document.getElementById('offersCount').textContent = patterns.offers?.length || 0;
+                }
+
+                // 2. Get user details
+                const user = await fetchWithAuth(`${API_BASE}/user/${userId}`);
+                if (user.id) {
+                    document.getElementById('profileEmail').textContent = user.email || '-';
+                    document.getElementById('profilePhone').textContent = user.phone || '-';
+                    document.getElementById('profileSince').textContent = user.created_at ? new Date(user.created_at).toLocaleDateString() : '-';
+                }
+
+                // 3. Get recent orders
+                const orders = await fetchWithAuth(`${API_BASE}/user/${userId}/orders`);
+                renderOrders(orders.orders || []);
+
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                document.getElementById('recentOrders').innerHTML = '<p>⚠️ Failed to load data</p>';
+            }
+        }
+
+        // ==================== RENDER ORDERS ====================
+        function renderOrders(orders) {
+            const container = document.getElementById('recentOrders');
+
+            if (!orders || orders.length === 0) {
+                container.innerHTML = '<p style="color:#636e72;text-align:center;">No orders yet. Start ordering! 🍔</p>';
+                return;
+            }
+
+            const recent = orders.slice(0, 5);
+            container.innerHTML = recent.map(order => `
+                <div class="order-item">
+                    <div class="order-info">
+                        <div class="items">${order.items?.map(item => item.name).join(', ') || 'Items'}</div>
+                        <div class="date">${new Date(order.timestamp).toLocaleString()}</div>
+                    </div>
+                    <div>
+                        <span class="order-status ${order.status || 'pending'}">${order.status || 'pending'}</span>
+                        <span style="font-weight:600;margin-left:10px;">$${order.total}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+
+        // ==================== RECOMMENDATIONS ====================
+            async function loadRecommendations() {
+                try {
+                    const patterns = await fetchWithAuth(`${API_BASE}/user/${userId}/patterns`);
+                    const favorites = patterns.preferences?.favorites || [];
+                    const combos = patterns.preferences?.combos || [];
+
+                    // Get recommended items based on favorites + combos
+                    const recommended = getRecommendedItems(favorites, combos);
+                    renderRecommendations(recommended);
+                } catch (error) {
+                    console.error('Error loading recommendations:', error);
+                }
+            }
+
+            function getRecommendedItems(favorites, combos) {
+                // Mock menu items (same as menu page)
+                const allItems = [
+                    { id: 1, name: 'Classic Cheeseburger', category: 'burger', price: 10.99, emoji: '🍔' },
+                    { id: 2, name: 'Chicken Burger', category: 'burger', price: 12.99, emoji: '🍗' },
+                    { id: 3, name: 'Margherita Pizza', category: 'pizza', price: 15.99, emoji: '🍕' },
+                    { id: 4, name: 'Pepperoni Pizza', category: 'pizza', price: 17.99, emoji: '🍕' },
+                    { id: 5, name: 'French Fries', category: 'sides', price: 4.99, emoji: '🍟' },
+                    { id: 6, name: 'Onion Rings', category: 'sides', price: 5.99, emoji: '🧅' },
+                    { id: 7, name: 'Coca-Cola', category: 'drinks', price: 2.99, emoji: '🥤' },
+                    { id: 8, name: 'Milkshake', category: 'drinks', price: 5.99, emoji: '🥛' },
+                    { id: 9, name: 'Chocolate Brownie', category: 'desserts', price: 6.99, emoji: '🍫' },
+                    { id: 10, name: 'Cheesecake', category: 'desserts', price: 7.99, emoji: '🍰' }
+                ];
+
+                // Get favorite item names
+                const favNames = favorites.map(f => f.name);
+                const favCategories = favorites.map(f => f.category);
+
+                // Find items similar to favorites
+                let recommended = allItems.filter(item =>
+                    favNames.includes(item.name) ||
+                    favCategories.includes(item.category)
+                );
+
+                // Add combo items
+                combos.forEach(combo => {
+                    combo.items.forEach(itemName => {
+                        const found = allItems.find(i => i.name === itemName);
+                        if (found && !recommended.find(r => r.id === found.id)) {
+                            recommended.push(found);
+                        }
+                    });
+                });
+
+                // Remove duplicates and limit to 6
+                return recommended.slice(0, 6);
+            }
+
+            function renderRecommendations(items) {
+                const grid = document.getElementById('recommendationsGrid');
+
+                if (!items || items.length === 0) {
+                    grid.innerHTML = '<p style="color:#636e72;text-align:center;">Order something to get recommendations! 🍔</p>';
+                    return;
+                }
+
+                grid.innerHTML = items.map(item => `
+        <div style="background: #f8f9fa; border-radius: 12px; padding: 15px; text-align: center; transition: transform 0.3s; cursor: pointer;" 
+             onmouseover="this.style.transform='scale(1.03)'" 
+             onmouseout="this.style.transform='scale(1)'">
+            <div style="font-size: 40px;">${item.emoji || '🍽️'}</div>
+            <div style="font-weight: 600; margin: 8px 0;">${item.name}</div>
+            <div style="color: #6c5ce7; font-weight: 700;">$${item.price.toFixed(2)}</div>
+            <button onclick="addToCart(${item.id})" style="background: #6c5ce7; color: white; border: none; padding: 6px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 8px;">
+                Add to Cart
+            </button>
+        </div>
+    `).join('');
+            }
+
+            function addToCart(itemId) {
+                    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                    const item = { id: itemId, name: 'Item', price: 0 };
+
+                    // Find item from menu (you can use the same menu data)
+                    // For now, using mock data
+                    const menuItems = [
+                        { id: 1, name: 'Classic Cheeseburger', price: 10.99 },
+                        { id: 2, name: 'Chicken Burger', price: 12.99 },
+                        { id: 3, name: 'Margherita Pizza', price: 15.99 },
+                        { id: 4, name: 'Pepperoni Pizza', price: 17.99 },
+                        { id: 5, name: 'French Fries', price: 4.99 },
+                        { id: 6, name: 'Onion Rings', price: 5.99 },
+                        { id: 7, name: 'Coca-Cola', price: 2.99 },
+                        { id: 8, name: 'Milkshake', price: 5.99 },
+                        { id: 9, name: 'Chocolate Brownie', price: 6.99 },
+                        { id: 10, name: 'Cheesecake', price: 7.99 }
+                    ];
+
+                    const found = menuItems.find(i => i.id === itemId);
+                    if (!found) return;
+
+                    const existing = cart.find(i => i.id === itemId);
+                    if (existing) {
+                        existing.quantity += 1;
+                    } else {
+                        cart.push({ ...found, quantity: 1 });
+                    }
+
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    showToast(`✅ ${found.name} added to cart!`);
+                }
+
+                
+        // ==================== LOGOUT ====================
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'auth.html';
+        }
+
+        // ==================== LOAD ====================
+        window.onload = loadDashboard;
+
+        // ==================== REAL-TIME NOTIFICATIONS (WebSocket) ====================
+        function connectWebSocket() {
+            const ws = new WebSocket(`ws://localhost:8003/ws/${userId}`);
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'new_notification') {
+                        const count = parseInt(document.getElementById('notifCount').textContent) + 1;
+                        document.getElementById('notifCount').textContent = count;
+                    }
+                } catch (e) { }
+            };
+            ws.onclose = () => setTimeout(connectWebSocket, 3000);
+        }
+
+        connectWebSocket();
+    </script>
+</body>
+
+</html>
